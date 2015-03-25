@@ -5,6 +5,9 @@
 [![Latest Unstable Version](https://poser.pugx.org/understand/understand-laravel5/v/unstable.svg)](https://packagist.org/packages/understand/understand-laravel5) 
 [![License](https://poser.pugx.org/understand/understand-laravel5/license.svg)](https://packagist.org/packages/understand/understand-laravel5)
 
+> [Laravel 4 service provider](https://github.com/understand/understand-laravel)
+
+
 ### Introduction
 
 This packages provides a full abstraction for Understand.io and provides extra features to improve Laravel's default logging capabilities. It is essentially a wrapper around Laravel's event handler to take full advantage of Understand.io's data aggregation and analysis capabilities.
