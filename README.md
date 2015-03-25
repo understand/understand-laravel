@@ -35,7 +35,13 @@ This packages provides a full abstraction for Understand.io and provides extra f
     php artisan vendor:publish --provider="Understand\UnderstandLaravel5\UnderstandLaravel5ServiceProvider"
     ```
 
-5. Open ```app/Exceptions/Handler.php``` and put this line ```\UnderstandExceptionLogger::log($e)``` inside ```report``` method.
+5. Set your input key in config file (```config/understand-laravel.php```)
+  
+    ```php
+    'token' => 'my-input-token'
+    ```
+
+6. Open ```app/Exceptions/Handler.php``` and put this line ```\UnderstandExceptionLogger::log($e)``` inside ```report``` method.
   
   ```php
   /**
@@ -54,13 +60,7 @@ This packages provides a full abstraction for Understand.io and provides extra f
   }
   ```
 
-6. Set your input key in config file (```config/understand-laravel.php```)
-  
-    ```php
-    'token' => 'my-input-token'
-    ```
-
-6. Send your first event
+7. Send your first event
 
     ```php 
     // anywhere inside your Laravel app
