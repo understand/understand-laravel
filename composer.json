@@ -17,7 +17,7 @@
         "phpunit/phpunit": "~4.0"
     },
     "autoload": {
-		"psr-4": {
+		"psr-0": {
             "Understand\\UnderstandLaravel5\\": "src"
 		}
     },
