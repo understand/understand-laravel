@@ -1,0 +1,32 @@
+{
+    "name": "understand/understand-laravel5",
+    "description": "Laravel 5 service provider for Understand.io",
+    "keywords": ["laravel", "undertstand.io", "understand", "logs", "laravel 5"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Aivis",
+            "email": "aivis.silins@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "ext-curl": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.0"
+    },
+    "autoload": {
+		"psr-4": {
+            "Understand\\UnderstandLaravel5\\": "src"
+		}
+    },
+    "extra": {
+        "component": "package",
+        "frameworks": ["Laravel 5"],
+        "branch-alias": {
+			"dev-master": "0.0-dev"
+		}
+    },
+    "minimum-stability": "stable"
+}
