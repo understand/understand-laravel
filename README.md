@@ -47,14 +47,6 @@ This packages provides a full abstraction for Understand.io and provides extra f
 6. Open ```app/Exceptions/Handler.php``` and put this line ```\UnderstandExceptionLogger::log($e)``` inside ```report``` method.
   
   ```php
-  /**
-   * Report or log an exception.
-   *
-   * This is a great spot to send exceptions to Sentry, Bugsnag, etc.
-   *
-   * @param  \Exception  $e
-   * @return void
-   */
   public function report(Exception $e)
   {
       \UnderstandExceptionLogger::log($e);
