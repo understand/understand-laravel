@@ -26,7 +26,7 @@ This packages provides a full abstraction for Understand.io and provides extra f
     composer update understand/understand-laravel5
     ```
 
-3. Add the ServiceProvider to the providers array in app/config/app.php
+3. Add the ServiceProvider to the providers array in config/app.php
   
     ```php
     'Understand\UnderstandLaravel5\UnderstandLaravel5ServiceProvider',
