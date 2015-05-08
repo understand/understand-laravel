@@ -228,14 +228,14 @@ class FieldProvider
 
         if ( ! starts_with($url, '/'))
         {
-            $url .= '/';
+            $url = '/' . $url;
         }
 
         $queryString = $this->request->getQueryString();
 
         if ($queryString)
         {
-            $url.= '?' . $queryString;
+            $url .= '?' . $queryString;
         }
 
         return $url;
