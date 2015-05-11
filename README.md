@@ -192,14 +192,32 @@ This additional meta data will then be automatically appended to all of your Lar
 
 
 ### How to send data asynchronously
-By default each log event will be sent to Understand.io's api server directly after the event happens. If you generate a large number of logs, this could slow your app down and, in these scenarios, we recommend that you make use of a queue handler. To do this, change the config parameter `handler` to `queue` and Laravel queues will be automatically used. Bear in mind that by the default Laravel queue is `sync`, so you will still need to configure your queues properly using something like iron.io or Amazon SQS. See http://laravel.com/docs/queues for more information. 
+
+##### Async handler
+By default each log event will be sent to Understand.io's api server directly after the event happens. If you generate a large number of logs, this could slow your app down and, in these scenarios, we recommend that you make use of a async handler. To do this, change the config parameter `handler` to `async`.
 
 ```php
 /**
- * Specify which handler to use (sync|queue)
+ * Specify which handler to use - sync, queue or async. 
+ * 
+ * Note that the async handler will only work in systems where 
+ * the CURL command line tool is installed
  */
-'handler' => 'queue',
+'handler' => 'async', 
 ```
+
+The async handler is supported in most of the systems - the only requirement is that CURL command line tool is installed and functioning correctly. To check whether CURL is available on your system, execute following command in your console:
+
+```
+curl -h
+```
+
+If you see instructions on how to use CURL then your system has the CURL binary installed and you can use the ```async``` handler.
+
+> Keep in mind that Laravel allows you to specify different configuration values in different environments. You could, for example, use the async handler in production and the sync handler in development.
+
+##### Laravel queue handler
+Although we generally recommend using the async handler, making use of queues is another another option. Bear in mind that by the default Laravel queue is `sync`, so you will still need to configure your queues properly using something like iron.io or Amazon SQS. See http://laravel.com/docs/queues for more information. 
 
 ### Configuration
 
@@ -217,7 +235,10 @@ return [
     'silent' => true,
 
     /**
-     * Specify which handler to use (sync|queue)
+     * Specify which handler to use - sync, queue or async. 
+     * 
+     * Note that the async handler will only work in systems where 
+     * the CURL command line tool is installed
      */
     'handler' => 'sync',
     
