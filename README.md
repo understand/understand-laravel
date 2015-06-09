@@ -280,6 +280,12 @@ return [
 ];
 ```
 
+### Requirements 
+##### UTF-8
+This package uses the json_encode function, which only supports UTF-8 data, and you should therefore ensure that all of your data is correctly encoded. In the event that your log data contains non UTF-8 strings, then the json_encode function will not be able to serialize the data.
+
+http://php.net/manual/en/function.json-encode.php
+
 ### License
 
 The Laravel Understand.io service provider is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
