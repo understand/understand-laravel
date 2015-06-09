@@ -147,8 +147,9 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
         {
             $fieldProvider = $app['understand.field-provider'];
             $handler = $this->resolveHandler($app);
+            $silent = $app['config']->get('understand-laravel.silent');
 
-            return new Logger($fieldProvider, $handler);
+            return new Logger($fieldProvider, $handler, $silent);
         });
 
         $this->app->booting(function()
