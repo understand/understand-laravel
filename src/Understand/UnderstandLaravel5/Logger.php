@@ -21,13 +21,22 @@ class Logger
     protected $handler;
 
     /**
+     * Specifies whether logger should throw an exception of issues detected
+     *
+     * @var bool
+     */
+    protected $silent = true;
+
+    /**
      * @param \Understand\UnderstandLaravel\FieldProvider $fieldProvider
      * @param \Understand\UnderstandLaravel\Handlers\BaseHandler $handler
+     * @param bool $silent
      */
-    public function __construct(FieldProvider $fieldProvider, BaseHandler $handler)
+    public function __construct(FieldProvider $fieldProvider, BaseHandler $handler, $silent = true)
     {
         $this->setFieldProvider($fieldProvider);
         $this->setHandler($handler);
+        $this->silent = $silent;
     }
 
     /**
@@ -108,12 +117,24 @@ class Logger
     /**
      * Send data to storage
      *
-     * @param string $requestData
+     * @param array $requestData
      * @return mixed
      */
     protected function send(array $event)
     {
-        return $this->handler->handle($event);
+        try
+        {
+            return $this->handler->handle($event);
+        }
+        catch (\Exception $ex)
+        {
+            if (! $this->silent)
+            {
+                throw new $ex;
+            }
+
+            return false;
+        }
     }
 
 }
