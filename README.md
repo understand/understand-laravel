@@ -14,37 +14,31 @@ This packages provides a full abstraction for Understand.io and provides extra f
 
 ### Quick start
 
-1. Add this package to your composer.json
-
-    ```php
-    "understand/understand-laravel5": "0.0.*"
-    ```
-
-2. Update composer.json packages
+1. Add package to your project.
     
     ```
-    composer update understand/understand-laravel5
+    composer require understand/understand-laravel5
     ```
 
-3. Add the ServiceProvider to the providers array in config/app.php
+2. Add the ServiceProvider to the providers array in config/app.php
   
     ```php
     'Understand\UnderstandLaravel5\UnderstandLaravel5ServiceProvider',
     ```
 
-4. Publish configuration file
+3. Publish configuration file
 
     ```
     php artisan vendor:publish --provider="Understand\UnderstandLaravel5\UnderstandLaravel5ServiceProvider"
     ```
 
-5. Set your input key in config file (```config/understand-laravel.php```)
+4. Set your input key in config file (```config/understand-laravel.php```)
   
     ```php
     'token' => 'my-input-token'
     ```
 
-6. Open ```app/Exceptions/Handler.php``` and put this line ```\UnderstandExceptionLogger::log($e)``` inside ```report``` method.
+5. Open ```app/Exceptions/Handler.php``` and put this line ```\UnderstandExceptionLogger::log($e)``` inside ```report``` method.
   
   ```php
   public function report(Exception $e)
@@ -55,7 +49,7 @@ This packages provides a full abstraction for Understand.io and provides extra f
   }
   ```
 
-7. Send your first event
+6. Send your first event
 
     ```php 
     // anywhere inside your Laravel app
