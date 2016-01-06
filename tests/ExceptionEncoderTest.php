@@ -52,4 +52,15 @@ class ExceptionEncoderTest extends PHPUnit_Framework_TestCase
 
         $this->assertEmpty($stackTraceArray[0]['args']);
     }
+    
+    public function testUndefinedFunctionIndex()
+    {
+        $stackTrace = debug_backtrace();
+        unset($stackTrace[0]['function']);
+
+        $encoder = new Understand\UnderstandLaravel5\ExceptionEncoder();
+        $stackTraceArray = $encoder->stackTraceToArray($stackTrace);
+
+        $this->assertEmpty($stackTraceArray[0]['function']);
+    }
 }

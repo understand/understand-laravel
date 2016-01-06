@@ -224,14 +224,17 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
             else if ($message instanceof \Exception)
             {
                 $log = $this->app['understand.exception-encoder']->exceptionToArray($message);
+                $log['tags'] = ['exception_log'];
             }
             else if (is_string($message))
             {
                 $log['message'] = $message;
+                $log['tags'] = ['laravel_log'];
             }
             else
             {
                 $log = $message;
+                $log['tags'] = ['laravel_log'];
             }
 
             if ($context)
@@ -239,7 +242,6 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
                 $log['context'] = $context;
             }
 
-            $log['tags'] = ['laravel_log'];
             $log['level'] = $level;
 
             $additional = $this->app['config']->get('understand-laravel.log_types.laravel_log.meta', []);

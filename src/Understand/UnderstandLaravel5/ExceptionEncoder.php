@@ -41,8 +41,8 @@ class ExceptionEncoder
             $args = $this->stackTraceArgsToArray($trace);
 
             $stack[] = [
-                'class' => isset($trace['class']) ? $trace['class'] : '',
-                'function' => $trace['function'],
+                'class' => isset($trace['class']) ? $trace['class'] : null,
+                'function' => isset($trace['function']) ? $trace['function'] : null,
                 'args' => $args,
                 'type' => $type,
                 'file' => $this->getStackTraceFile($trace),
