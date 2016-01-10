@@ -46,7 +46,7 @@ This packages provides a full abstraction for Understand.io and provides extra f
     \Log::info('Understand.io test');
     ```
     
-6. If you are using Laravel 5.0 (`>= 5.0, < 5.1`) version, please read about - [how to report Laravel 5.0 exceptions](#).
+6. If you are using Laravel 5.0 (`>= 5.0, < 5.1`) version, please read about - [how to report Laravel 5.0 exceptions](#how-to-report-laravel-50--50--51-exceptions).
     
 ### How to send events/logs
 
