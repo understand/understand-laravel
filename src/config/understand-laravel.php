@@ -29,6 +29,7 @@ return [
                 'user_id' => 'UnderstandFieldProvider::getUserId',
                 'env' => 'UnderstandFieldProvider::getEnvironment',
                 'client_ip' => 'UnderstandFieldProvider::getClientIp',
+                'url' => 'UnderstandFieldProvider::getUrl',
             ]
         ],
         'laravel_log' => [
@@ -38,6 +39,7 @@ return [
                 'request_id' => 'UnderstandFieldProvider::getProcessIdentifier',
                 'user_id' => 'UnderstandFieldProvider::getUserId',
                 'env' => 'UnderstandFieldProvider::getEnvironment',
+                'url' => 'UnderstandFieldProvider::getUrl',
                 'client_ip' => 'UnderstandFieldProvider::getClientIp',
             ]
         ],
