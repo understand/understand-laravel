@@ -30,6 +30,7 @@ return [
                 'env' => 'UnderstandFieldProvider::getEnvironment',
                 'client_ip' => 'UnderstandFieldProvider::getClientIp',
                 'url' => 'UnderstandFieldProvider::getUrl',
+                'method' => 'UnderstandFieldProvider::getRequestMethod',
             ]
         ],
         'laravel_log' => [
@@ -40,6 +41,7 @@ return [
                 'user_id' => 'UnderstandFieldProvider::getUserId',
                 'env' => 'UnderstandFieldProvider::getEnvironment',
                 'url' => 'UnderstandFieldProvider::getUrl',
+                'method' => 'UnderstandFieldProvider::getRequestMethod',
                 'client_ip' => 'UnderstandFieldProvider::getClientIp',
             ]
         ],
