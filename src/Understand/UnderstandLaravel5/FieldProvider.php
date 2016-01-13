@@ -311,27 +311,33 @@ class FieldProvider
     {
         try
         {
-            if (class_exists('\Auth') && \Auth::id())
+            if (class_exists('\Auth') && ($userId = \Auth::id()))
             {
-                return \Auth::id();
+                return $userId;
             }
         }
-        catch (\Exception $e)
+        catch (\Exception $e) 
+        {}
+
+        try 
         {
-
-        }
-
+            if (class_exists('\Sentinel') && ($user = \Sentinel::getUser()))
+            {
+                return $user->id;
+            }
+        } 
+        catch (\Exception $e) 
+        {}
+        
         try
         {
-            if (class_exists('\Sentry') && \Sentry::getUser())
+            if (class_exists('\Sentry') && ($user = \Sentry::getUser()))
             {
-                return \Sentry::getUser()->id;
+                return $user->id;
             }
         }
-        catch (\Exception $e)
-        {
-
-        }
+        catch (\Exception $e) 
+        {}
     }
 
     /**
