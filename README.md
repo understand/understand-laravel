@@ -38,24 +38,15 @@ This packages provides a full abstraction for Understand.io and provides extra f
     ```php
     'token' => 'my-input-token'
     ```
-
-5. Open ```app/Exceptions/Handler.php``` and put this line ```\UnderstandExceptionLogger::log($e)``` inside ```report``` method.
-  
-  ```php
-  public function report(Exception $e)
-  {
-      \UnderstandExceptionLogger::log($e);
-
-      return parent::report($e);
-  }
-  ```
-
-6. Send your first event
+    
+5. Send your first event
 
     ```php 
     // anywhere inside your Laravel app
     \Log::info('Understand.io test');
     ```
+    
+6. If you are using Laravel 5.0 (`>= 5.0, < 5.1`) version, please read about - [how to report Laravel 5.0 exceptions](#how-to-report-laravel-50--50--51-exceptions).
     
 ### How to send events/logs
 
@@ -214,6 +205,23 @@ If you see instructions on how to use CURL then your system has the CURL binary 
 ##### Laravel queue handler
 Although we generally recommend using the async handler, making use of queues is another another option. Bear in mind that by the default Laravel queue is `sync`, so you will still need to configure your queues properly using something like iron.io or Amazon SQS. See http://laravel.com/docs/queues for more information. 
 
+### How to report Laravel 5.0 (`>= 5.0, < 5.1`) exceptions 
+
+Laravel's (`>= 5.0, < 5.1`) exception logger doesn't use event dispatcher (https://github.com/laravel/framework/pull/10922) and that's why you need to add the following line to your `Handler.php` file (otherwise Laravel's exceptions will not be sent Understand.io).
+
+- Open ```app/Exceptions/Handler.php``` and put this line ```\UnderstandExceptionLogger::log($e)``` inside ```report``` method.
+  
+  ```php
+  public function report(Exception $e)
+  {
+      \UnderstandExceptionLogger::log($e);
+
+      return parent::report($e);
+  }
+  ```
+ 
+  
+
 ### Configuration
 
 ```php
@@ -245,6 +253,8 @@ return [
                 'request_id' => 'UnderstandFieldProvider::getProcessIdentifier',
                 'user_id' => 'UnderstandFieldProvider::getUserId',
                 'env' => 'UnderstandFieldProvider::getEnvironment',
+                'url' => 'UnderstandFieldProvider::getUrl',
+                'method' => 'UnderstandFieldProvider::getRequestMethod',
                 'client_ip' => 'UnderstandFieldProvider::getClientIp',
             ]
         ],
@@ -255,6 +265,8 @@ return [
                 'request_id' => 'UnderstandFieldProvider::getProcessIdentifier',
                 'user_id' => 'UnderstandFieldProvider::getUserId',
                 'env' => 'UnderstandFieldProvider::getEnvironment',
+                'url' => 'UnderstandFieldProvider::getUrl',
+                'method' => 'UnderstandFieldProvider::getRequestMethod',
             ]
         ],
         'exception_log' => [
