@@ -61,7 +61,7 @@ By default, Laravel automatically stores its logs in ```storage/logs```. By usin
 [Laravel logging documentation](http://laravel.com/docs/errors#logging)
 
 #### PHP/Laravel exceptions
-By default, All exceptions will be send to Understand.io service.
+By default, All exceptions will be sent to Understand.io service.
 
 #### Eloquent model logs
 Eloquent model logs are generated whenever one of the `created`, `updated`, `deleted` or `restored` Eloquent events is fired. This allows you to automatically track all changes to your models and will contain a current model diff (`$model->getDirty()`), the type of event (created, updated, etc) and additonal meta data (user_id, session_id, etc). This means that all model events will be transformed into a log event which will be sent to Understand.io.
