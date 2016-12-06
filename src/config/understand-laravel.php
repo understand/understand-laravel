@@ -5,7 +5,7 @@ return [
     /**
      * Input key
      */
-    'token' => env('UNDERSTAND_TOKEN', ''),
+    'token' => env('UNDERSTAND_TOKEN'),
 
     /**
      * Specifies whether logger should throw an exception of issues detected
@@ -18,7 +18,7 @@ return [
      * Note that the async handler will only work in systems where 
      * the CURL command line tool is installed
      */
-    'handler' => env('UNDERSTAND_HANDLE', 'sync'),
+    'handler' => env('UNDERSTAND_HANDLER', 'sync'),
 
     'log_types' => [
         'eloquent_log' => [
