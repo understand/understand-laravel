@@ -28,26 +28,23 @@ This packages provides a full abstraction for Understand.io and provides extra f
     'Understand\UnderstandLaravel5\UnderstandLaravel5ServiceProvider',
     ```
 
-3. Publish configuration file
-
-    ```
-    php artisan vendor:publish --provider="Understand\UnderstandLaravel5\UnderstandLaravel5ServiceProvider"
-    ```
-
-4. Set your input key in config file (```config/understand-laravel.php```)
+3. Set Understand.io input key in your `.env` file
   
     ```php
-    'token' => 'my-input-token'
+    UNDERSTAND_TOKEN=your-input-token-from-understand-io
     ```
     
-5. Send your first event
+4. Send your first event
 
     ```php 
     // anywhere inside your Laravel app
     \Log::info('Understand.io test');
     ```
     
-6. If you are using Laravel 5.0 (`>= 5.0, < 5.1`) version, please read about - [how to report Laravel 5.0 exceptions](#how-to-report-laravel-50--50--51-exceptions).
+- We recommend that you make use of a async handler - [How to send data asynchronously](#how-to-send-data-asynchronously)  
+- If you are using Laravel 5.0 (`>= 5.0, < 5.1`) version, please read about - [How to report Laravel 5.0 exceptions](#how-to-report-laravel-50--50--51-exceptions).
+- For advanced configuration please read about - [Advanced configuration](#advanced-configuration)
+
     
 ### How to send events/logs
 
@@ -181,16 +178,14 @@ This additional meta data will then be automatically appended to all of your Lar
 ### How to send data asynchronously
 
 ##### Async handler
-By default each log event will be sent to Understand.io's api server directly after the event happens. If you generate a large number of logs, this could slow your app down and, in these scenarios, we recommend that you make use of a async handler. To do this, change the config parameter `handler` to `async`.
+By default each log event will be sent to Understand.io's api server directly after the event happens. If you generate a large number of logs, this could slow your app down and, in these scenarios, we recommend that you make use of a async handler. To do this, set the config parameter `UNDERSTAND_HANDLER` to `async` in your `.env` file.
 
 ```php
-/**
- * Specify which handler to use - sync, queue or async. 
- * 
- * Note that the async handler will only work in systems where 
- * the CURL command line tool is installed
- */
-'handler' => 'async', 
+# Specify which handler to use - sync, queue or async. 
+# 
+# Note that the async handler will only work in systems where 
+# the CURL command line tool is installed
+UNDERSTAND_HANDLER=async
 ```
 
 The async handler is supported in most of the systems - the only requirement is that CURL command line tool is installed and functioning correctly. To check whether CURL is available on your system, execute following command in your console:
@@ -223,28 +218,36 @@ Laravel's (`>= 5.0, < 5.1`) exception logger doesn't use event dispatcher (https
  
   
 
-### Configuration
+### Advanced Configuration
+
+
+1. Publish configuration file
+
+    ```
+    php artisan vendor:publish --provider="Understand\UnderstandLaravel5\UnderstandLaravel5ServiceProvider"
+    ```
+    
+2. And you can now make adjustments in your ```config/understand-laravel.php``` file
 
 ```php
 return [
-
     /**
      * Input key
      */
-    'token' => 'your-input-token-from-understand-io',
-
+    'token' => env('UNDERSTAND_TOKEN'),
+    
     /**
      * Specifies whether logger should throw an exception of issues detected
      */
     'silent' => true,
-
+    
     /**
      * Specify which handler to use - sync, queue or async. 
      * 
      * Note that the async handler will only work in systems where 
      * the CURL command line tool is installed
      */
-    'handler' => 'sync',
+    'handler' => env('UNDERSTAND_HANDLER', 'sync'),
     
     'log_types' => [
         'eloquent_log' => [
@@ -268,6 +271,7 @@ return [
                 'env' => 'UnderstandFieldProvider::getEnvironment',
                 'url' => 'UnderstandFieldProvider::getUrl',
                 'method' => 'UnderstandFieldProvider::getRequestMethod',
+                'client_ip' => 'UnderstandFieldProvider::getClientIp',
             ]
         ],
         'exception_log' => [
@@ -284,7 +288,6 @@ return [
             ]
         ]
     ]
-
 ];
 ```
 
