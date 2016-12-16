@@ -72,7 +72,10 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
         {
             $fieldProvider = new FieldProvider();
 
-            $fieldProvider->setSessionStore($app['session.store']);
+	    if ($app['config']['session.driver']) 
+	    {
+                $fieldProvider->setSessionStore($app['session.store']);
+            }
             $fieldProvider->setRouter($app['router']);
             $fieldProvider->setRequest($app['request']);
             $fieldProvider->setEnvironment($app->environment());
