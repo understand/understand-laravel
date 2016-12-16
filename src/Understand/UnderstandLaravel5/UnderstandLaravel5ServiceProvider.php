@@ -1,6 +1,5 @@
 <?php namespace Understand\UnderstandLaravel5;
 
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\AliasLoader;
 
@@ -73,7 +72,8 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
         {
             $fieldProvider = new FieldProvider();
 
-	    if (Session::getDefaultDriver()) {
+	    if ($app['config']['session.driver']) 
+	    {
                 $fieldProvider->setSessionStore($app['session.store']);
             }
             $fieldProvider->setRouter($app['router']);
