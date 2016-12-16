@@ -106,7 +106,7 @@ class FieldProvider
     /**
      * Set request
      *
-     * @param Request $server
+     * @param Request $request
      */
     public function setRequest(Request $request)
     {
@@ -199,6 +199,11 @@ class FieldProvider
      */
     protected function getSessionId()
     {
+        if ( ! $this->session)
+        {
+            return null;
+        }
+        
         $sessionId = $this->session->getId();
 
         // by default we provide only hashed version of session id
@@ -214,6 +219,11 @@ class FieldProvider
      */
     protected function getRouteName()
     {
+        if ( ! $this->router)
+        {
+            return null;
+        }
+        
         return $this->router->getCurrentRoute()->getName();
     }
 
@@ -224,6 +234,11 @@ class FieldProvider
      */
     protected function getUrl()
     {
+        if ( ! $this->request)
+        {
+            return null;
+        }
+        
         $url = $this->request->path();
 
         if ( ! starts_with($url, '/'))
@@ -248,6 +263,11 @@ class FieldProvider
      */
     protected function getRequestMethod()
     {
+        if ( ! $this->request)
+        {
+            return null;
+        }
+        
         return $this->request->method();
     }
 
@@ -258,6 +278,11 @@ class FieldProvider
      */
     protected function getServerIp()
     {
+        if ( ! $this->request)
+        {
+            return null;
+        }
+        
         return $this->request->server->get('SERVER_ADDR');
     }
 
@@ -268,6 +293,11 @@ class FieldProvider
      */
     protected function getClientIp()
     {
+        if ( ! $this->request)
+        {
+            return null;
+        }
+        
         return $this->request->getClientIp();
     }
 
@@ -278,6 +308,11 @@ class FieldProvider
      */
     protected function getClientUserAgent()
     {
+        if ( ! $this->request)
+        {
+            return null;
+        }
+        
         return $this->request->server->get('HTTP_USER_AGENT');
     }
 
@@ -299,6 +334,11 @@ class FieldProvider
      */
     protected function getFromSession($key)
     {
+        if ( ! $this->session)
+        {
+            return null;
+        }
+        
         return $this->session->get($key);
     }
 
