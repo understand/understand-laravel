@@ -2,6 +2,8 @@
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\AliasLoader;
+use Illuminate\Support\Str;
+use Illuminate\Foundation\Application;
 
 class UnderstandLaravel5ServiceProvider extends ServiceProvider
 {
@@ -172,6 +174,7 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
     protected function resolveHandler($app)
     {
         $inputToken = $app['config']->get('understand-laravel.token');
+
         $apiUrl = $app['config']->get('understand-laravel.url', 'https://api.understand.io');
         $silent = $app['config']->get('understand-laravel.silent');
         $handlerType = $app['config']->get('understand-laravel.handler');
@@ -218,40 +221,67 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
      */
     protected function listenLaravelEvents()
     {
-        $this->app['events']->listen('illuminate.log', function($level, $message, $context)
+        // only Laravel versions below L5.4 supports `illuminate.log`
+        if (Str::startsWith(Application::VERSION, ['5.0', '5.1', '5.2', '5.3']))
         {
-            if ($message instanceof Exceptions\HandlerException)
+            $this->app['events']->listen('illuminate.log', function($level, $message, $context)
             {
-                return;
-            }
-            else if ($message instanceof \Exception)
+                $this->handleEvent($level, $message, $context);
+            });
+        }
+        else
+        {
+            // starting from L5.4 MessageLogged event class was introduced
+            // https://github.com/laravel/framework/commit/57c82d095c356a0fe0f9381536afec768cdcc072
+            $this->app['events']->listen('Illuminate\Log\Events\MessageLogged', function($log) 
             {
-                $log = $this->app['understand.exception-encoder']->exceptionToArray($message);
-                $log['tags'] = ['exception_log'];
-            }
-            else if (is_string($message))
-            {
-                $log['message'] = $message;
-                $log['tags'] = ['laravel_log'];
-            }
-            else
-            {
-                $log = $message;
-                $log['tags'] = ['laravel_log'];
-            }
 
-            if ($context)
-            {
-                $log['context'] = $context;
-            }
-
-            $log['level'] = $level;
-
-            $additional = $this->app['config']->get('understand-laravel.log_types.laravel_log.meta', []);
-            $this->app['understand.logger']->log($log, $additional);
-        });
+                $this->handleEvent($log->level, $log->message, $log->context);
+            });
+        }
     }
 
+    /**
+     * Handle a new log event
+     * 
+     * @param string $level
+     * @param mixed $message
+     * @param array $context
+     * @return void
+     */
+    protected function handleEvent($level, $message, $context)
+    {
+        if ($message instanceof Exceptions\HandlerException)
+        {
+            return;
+        }
+        else if ($message instanceof \Exception)
+        {
+            $log = $this->app['understand.exception-encoder']->exceptionToArray($message);
+            $log['tags'] = ['exception_log'];
+        }
+        else if (is_string($message))
+        {
+            $log['message'] = $message;
+            $log['tags'] = ['laravel_log'];
+        }
+        else
+        {
+            $log = $message;
+            $log['tags'] = ['laravel_log'];
+        }
+
+        if ($context)
+        {
+            $log['context'] = $context;
+        }
+
+        $log['level'] = $level;
+
+        $additional = $this->app['config']->get('understand-laravel.log_types.laravel_log.meta', []);
+        $this->app['understand.logger']->log($log, $additional);
+    }
+    
     /**
      * Listen eloquent model events and log them
      *
