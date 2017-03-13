@@ -251,6 +251,8 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
      */
     protected function handleEvent($level, $message, $context)
     {
+        $log = [];
+        
         if ($message instanceof Exceptions\HandlerException)
         {
             return;
@@ -260,14 +262,15 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
             $log = $this->app['understand.exception-encoder']->exceptionToArray($message);
             $log['tags'] = ['exception_log'];
         }
-        else if (is_string($message))
+        // // integer, float, string or boolean as message
+        else if (is_scalar($message))
         {
             $log['message'] = $message;
             $log['tags'] = ['laravel_log'];
         }
         else
         {
-            $log = $message;
+            $log = (array)$message;
             $log['tags'] = ['laravel_log'];
         }
 

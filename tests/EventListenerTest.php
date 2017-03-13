@@ -122,4 +122,94 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
         $this->assertNotEmpty($token2);
         $this->assertSame($token2, $token);
     }
+    
+    /**
+     * @return void
+     */
+    public function testLoggerMessageInteger()
+    {
+        $called = 0;
+        $message = 123;
+        $messageSame = false;
+        $laravelLogTag = false;
+
+        $callback = function($data) use(&$called, &$messageSame, &$laravelLogTag, $message)
+        {
+            $called++;
+            $decoded = json_decode($data, true);
+
+            $messageSame = (string)$message === $decoded['message'];
+            $laravelLogTag = in_array('exception_log', $decoded['tags'], true);
+        };
+
+        $fieldProvider = $this->app['understand.field-provider'];
+        $handler = new CallbackHandler($callback);
+
+        $this->app['understand.logger'] = new Logger($fieldProvider, $handler, false);
+
+        $this->app['Psr\Log\LoggerInterface']->error($message);
+
+        $this->assertSame($called, 1);
+        $this->assertTrue($messageSame);
+    }
+    
+    /**
+     * @return void
+     */
+    public function testLoggerMessageBoolean()
+    {
+        $called = 0;
+        $messageSame = false;
+        $laravelLogTag = false;
+
+        $callback = function($data) use(&$called, &$messageSame, &$laravelLogTag)
+        {
+            $called++;
+            $decoded = json_decode($data, true);
+
+            // `false` should be casted to `0`
+            $messageSame = '0' === $decoded['message'];
+            $laravelLogTag = in_array('exception_log', $decoded['tags'], true);
+        };
+
+        $fieldProvider = $this->app['understand.field-provider'];
+        $handler = new CallbackHandler($callback);
+
+        $this->app['understand.logger'] = new Logger($fieldProvider, $handler, false);
+
+        $this->app['Psr\Log\LoggerInterface']->error(false);
+
+        $this->assertSame($called, 1);
+        $this->assertTrue($messageSame);
+    }
+    
+    /**
+     * @return void
+     */
+    public function testLoggerMessageObject()
+    {
+        $called = 0;
+        $object = new \Illuminate\Support\Fluent(['test' => 123]);
+        $messageSame = false;
+        $laravelLogTag = false;
+
+        $callback = function($data) use(&$called, &$messageSame, &$laravelLogTag, $object)
+        {
+            $called++;
+            $decoded = json_decode($data, true);
+
+            $messageSame = $object->toJson() === $decoded['message'];
+            $laravelLogTag = in_array('exception_log', $decoded['tags'], true);
+        };
+
+        $fieldProvider = $this->app['understand.field-provider'];
+        $handler = new CallbackHandler($callback);
+
+        $this->app['understand.logger'] = new Logger($fieldProvider, $handler, false);
+
+        $this->app['Psr\Log\LoggerInterface']->error($object);
+
+        $this->assertSame($called, 1);
+        $this->assertTrue($messageSame);
+    }
 }
