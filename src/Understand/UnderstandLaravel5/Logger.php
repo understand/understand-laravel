@@ -79,7 +79,15 @@ class Logger
     protected function prepare($log, array $additional = [])
     {
         // integer, float, string or boolean as message
-        $log = is_scalar($log) ? ['message' => $log] : $log;
+        if (is_scalar($log))
+        {
+            $log = ['message' => $log];
+        }
+        
+        if (isset($log['message']))
+        {
+            $log['message'] = $this->formatMessage($log['message']);
+        }
 
         // resolve additonal properties from field providers
         $data = $this->fieldProvider->resolveValues($additional);
@@ -92,6 +100,28 @@ class Logger
         }
 
         return $event;
+    }
+    
+    /**
+     * Format message field
+     * 
+     * @param string $message
+     * @return string
+     */
+    protected function formatMessage($message)
+    {
+        if ( ! is_bool($message))
+        {
+            return (string)$message;
+        }
+        
+        // cast boolean values to "1" or "0" strings
+        if ($message)
+        {
+            return '1';
+        }
+        
+        return '0';
     }
 
     /**
