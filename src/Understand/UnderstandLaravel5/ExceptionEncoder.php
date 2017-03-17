@@ -146,9 +146,13 @@ class ExceptionEncoder
             {
                 $params[] = 'bool(' . ($arg ? 'true' : 'false') . ')';
             }
+            else if ($arg instanceof \__PHP_Incomplete_Class)
+            {
+                $params[] = 'object(__PHP_Incomplete_Class)'; 
+            }
             else
             {
-                $params[] = (string) $arg;
+                $params[] = gettype($arg);
             }
         }
 
