@@ -66,6 +66,8 @@ class ExceptionEncoderTest extends PHPUnit_Framework_TestCase
     
     public function testIncompleteClass()
     {
+        $catched = false;
+        
         try 
         {
             // trigger invalid argument exception
@@ -79,10 +81,26 @@ class ExceptionEncoderTest extends PHPUnit_Framework_TestCase
         } 
         catch (\Exception $exception) 
         {
-            $encoder = new Understand\UnderstandLaravel5\ExceptionEncoder();
-            $stackTraceArray = $encoder->stackTraceToArray($exception->getTrace());
-
-            $this->assertSame('object(__PHP_Incomplete_Class)', $stackTraceArray[1]['args'][0]);
+            $this->assertIncompleteClassStackTrace($exception);
+            $catched = true;
         }
+        catch (\TypeError $exception)
+        {
+            $this->assertIncompleteClassStackTrace($exception);
+            $catched = true;
+        }
+        
+        $this->assertTrue($catched);
+    }
+    
+    /**
+     * @param object $exception
+     */
+    protected function assertIncompleteClassStackTrace($exception)
+    {
+        $encoder = new Understand\UnderstandLaravel5\ExceptionEncoder();
+        $stackTraceArray = $encoder->stackTraceToArray($exception->getTrace());
+
+        $this->assertSame('object(__PHP_Incomplete_Class)', $stackTraceArray[1]['args'][0]);
     }
 }
