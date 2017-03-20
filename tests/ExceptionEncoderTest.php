@@ -81,12 +81,13 @@ class ExceptionEncoderTest extends PHPUnit_Framework_TestCase
         } 
         catch (\Exception $exception) 
         {
-            $this->assertIncompleteClassStackTrace($exception);
+            $this->assertIncompleteClassStackTrace($exception, 1);
             $catched = true;
         }
+        // catch php7 TypeError
         catch (\TypeError $exception)
         {
-            $this->assertIncompleteClassStackTrace($exception);
+            $this->assertIncompleteClassStackTrace($exception, 0);
             $catched = true;
         }
         
@@ -95,12 +96,14 @@ class ExceptionEncoderTest extends PHPUnit_Framework_TestCase
     
     /**
      * @param object $exception
+     * @param integer $index
+     * @return void
      */
-    protected function assertIncompleteClassStackTrace($exception)
+    protected function assertIncompleteClassStackTrace($exception, $index)
     {
         $encoder = new Understand\UnderstandLaravel5\ExceptionEncoder();
         $stackTraceArray = $encoder->stackTraceToArray($exception->getTrace());
 
-        $this->assertSame('object(__PHP_Incomplete_Class)', $stackTraceArray[1]['args'][0]);
+        $this->assertSame('object(__PHP_Incomplete_Class)', $stackTraceArray[$index]['args'][0]);
     }
 }
