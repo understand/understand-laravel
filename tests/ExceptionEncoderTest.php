@@ -63,4 +63,47 @@ class ExceptionEncoderTest extends PHPUnit_Framework_TestCase
 
         $this->assertEmpty($stackTraceArray[0]['function']);
     }
+    
+    public function testIncompleteClass()
+    {
+        $catched = false;
+        
+        try 
+        {
+            // trigger invalid argument exception
+            // to test __PHP_Incomplete_Class argument serialisation in `stackTraceToArray`
+            // `Object of class __PHP_Incomplete_Class could not be converted to string`
+            $incompleteObject = unserialize('O:1:"a":1:{s:5:"value";s:3:"100";}');
+            
+            with(new Understand\UnderstandLaravel5\ExceptionEncoder())->exceptionToArray($incompleteObject);
+            
+            $this->fail('Should never be reached');
+        } 
+        catch (\Exception $exception) 
+        {
+            $this->assertIncompleteClassStackTrace($exception, 1);
+            $catched = true;
+        }
+        // catch php7 TypeError
+        catch (\TypeError $exception)
+        {
+            $this->assertIncompleteClassStackTrace($exception, 0);
+            $catched = true;
+        }
+        
+        $this->assertTrue($catched);
+    }
+    
+    /**
+     * @param object $exception
+     * @param integer $index
+     * @return void
+     */
+    protected function assertIncompleteClassStackTrace($exception, $index)
+    {
+        $encoder = new Understand\UnderstandLaravel5\ExceptionEncoder();
+        $stackTraceArray = $encoder->stackTraceToArray($exception->getTrace());
+
+        $this->assertSame('object(__PHP_Incomplete_Class)', $stackTraceArray[$index]['args'][0]);
+    }
 }
