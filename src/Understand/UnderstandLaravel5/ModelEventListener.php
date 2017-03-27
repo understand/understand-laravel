@@ -37,10 +37,12 @@ class ModelEventListener
      *
      * @param string $eventName
      * @param \Illuminate\Database\Eloquent\Model $model
+     * @param string $modelLevelEventName
      */
-    public function logModelEvent($eventName, Model $model)
+    public function logModelEvent($eventName, Model $model, $modelLevelEventName = null)
     {
         $log = [
+            'message' => is_null($modelLevelEventName) ? null : (string)$modelLevelEventName,
             'id' => (int) $model->id,
             'model_event' => $eventName,
             'model_name' => get_class($model),
