@@ -223,7 +223,7 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
      */
     protected function detectLaravelVersion(array $versions)
     {
-        return Str::startsWith(Application::VERSION, ['5.0', '5.1', '5.2', '5.3']);
+        return Str::startsWith(Application::VERSION, $versions);
     }
     
     /**
