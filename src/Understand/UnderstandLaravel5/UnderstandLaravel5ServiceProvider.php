@@ -4,6 +4,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\Str;
 use Illuminate\Foundation\Application;
+use Illuminate\Database\Eloquent\Model as EloquentModel;
 
 class UnderstandLaravel5ServiceProvider extends ServiceProvider
 {
@@ -213,7 +214,18 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
             return new ModelEventListener($logger, $additional);
         });
     }
-
+    
+    /**
+     * Detect Laravel version
+     * 
+     * @param array $versions
+     * @return type
+     */
+    protected function detectLaravelVersion(array $versions)
+    {
+        return Str::startsWith(Application::VERSION, ['5.0', '5.1', '5.2', '5.3']);
+    }
+    
     /**
      * Listen Laravel logs
      *
@@ -222,7 +234,7 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
     protected function listenLaravelEvents()
     {
         // only Laravel versions below L5.4 supports `illuminate.log`
-        if (Str::startsWith(Application::VERSION, ['5.0', '5.1', '5.2', '5.3']))
+        if ($this->detectLaravelVersion(['5.0', '5.1', '5.2', '5.3']))
         {
             $this->app['events']->listen('illuminate.log', function($level, $message, $context)
             {
@@ -303,10 +315,25 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
 
         foreach ($events as $listenerName => $eventName)
         {
-            $this->app['events']->listen($listenerName, function($model) use($modelLogger, $eventName)
+            if ($this->detectLaravelVersion(['5.0', '5.1', '5.2', '5.3']))
             {
-                $modelLogger->logModelEvent($eventName, $model);
-            });
+                $this->app['events']->listen($listenerName, function($model) use($modelLogger, $eventName)
+                {
+                    $modelLevelEventName = 'eloquent.' . $eventName . ': ' . get_class($model);
+                    
+                    $modelLogger->logModelEvent($eventName, $model, $modelLevelEventName);
+                });
+            }
+            else
+            {
+                $this->app['events']->listen($listenerName, function($modelLevelEventName, $eventPayload) use($modelLogger, $eventName)
+                {
+                    if (isset($eventPayload[0]) && $eventPayload[0] instanceof EloquentModel)
+                    {
+                        $modelLogger->logModelEvent($eventName, $eventPayload[0], $modelLevelEventName);
+                    }
+                });
+            }
         }
     }
 
