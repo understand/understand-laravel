@@ -209,7 +209,7 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
         $this->app->bind('understand.model-event-listener-provider', function($app)
         {
             $logger = $app['understand.logger'];
-            $additional = $this->app['config']->get('understand-laravel.log_types.eloquent_log.meta', []);
+            $additional = $app['config']->get('understand-laravel.log_types.eloquent_log.meta', []);
 
             return new ModelEventListener($logger, $additional);
         });
