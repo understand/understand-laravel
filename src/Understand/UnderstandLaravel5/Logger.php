@@ -9,74 +9,48 @@ class Logger
     /**
      * Field provider
      *
-     * @var Understand\UnderstandLaravel\FieldProvider
+     * @var FieldProvider
      */
     protected $fieldProvider;
 
     /**
      * Transport layer
      *
-     * @var Understand\UnderstandLaravel\Handlers\BaseHandler
+     * @var BaseHandler
      */
     protected $handler;
 
     /**
-     * Specifies whether logger should throw an exception of issues detected
-     *
-     * @var bool
-     */
-    protected $silent = true;
-
-    /**
-     * @param \Understand\UnderstandLaravel\FieldProvider $fieldProvider
-     * @param \Understand\UnderstandLaravel\Handlers\BaseHandler $handler
+     * @param FieldProvider $fieldProvider
+     * @param BaseHandler $handler
      * @param bool $silent
      */
-    public function __construct(FieldProvider $fieldProvider, BaseHandler $handler, $silent = true)
+    public function __construct(FieldProvider $fieldProvider, BaseHandler $handler)
     {
         $this->setFieldProvider($fieldProvider);
         $this->setHandler($handler);
-        $this->silent = $silent;
     }
 
     /**
-     * Resolve additonal fields and send event
-     *
-     * @param mixed $log
+     * @param $log
      * @param array $additional
-     * @return array
+     * @param array $customFields
+     * @return mixed
      */
-    public function log($log, array $additional = [])
+    public function log($log, array $additional = [], array $customFields = [])
     {
-        $event = $this->prepare($log, $additional);
+        $event = $this->prepare($log, $additional, $customFields);
 
         return $this->send($event);
     }
 
     /**
-     * Send multiple events
-     *
-     * @param array $data
+     * @param $log
+     * @param array $additional
+     * @param array $customFields
      * @return array
      */
-    public function bulkLog(array $events, array $additional = [])
-    {
-        foreach ($events as $key => $event)
-        {
-            $events[$key] = $this->prepare($event, $additional);
-        }
-
-        return $this->send($events);
-    }
-
-    /**
-     * Format data
-     *
-     * @param mixed $log
-     * @param array $additional
-     * @return type
-     */
-    protected function prepare($log, array $additional = [])
+    protected function prepare($log, array $additional = [], array $customFields = [])
     {
         // integer, float, string or boolean as message
         if (is_scalar($log))
@@ -89,8 +63,8 @@ class Logger
             $log['message'] = $this->formatMessage($log['message']);
         }
 
-        // resolve additonal properties from field providers
-        $data = $this->fieldProvider->resolveValues($additional);
+        // resolve additional properties from field providers
+        $data = $this->resolveData($log, $additional, $customFields);
 
         $event = $data + $log;
 
@@ -100,6 +74,24 @@ class Logger
         }
 
         return $event;
+    }
+
+    /**
+     * @param $log
+     * @param array $additional
+     * @param array $customFields
+     * @return array
+     */
+    protected function resolveData($log, array $additional = [], array $customFields = [])
+    {
+        $data = $this->fieldProvider->resolveValues($additional, $log);
+
+        if ($customFields)
+        {
+            $data['custom'] = $this->fieldProvider->resolveValues($customFields, $log);
+        }
+
+        return $data;
     }
     
     /**
@@ -137,7 +129,7 @@ class Logger
     /**
      * Set field provider
      *
-     * @param \Understand\UnderstandLaravel\FieldProvider $fieldProvider
+     * @param FieldProvider $fieldProvider
      */
     public function setFieldProvider(FieldProvider $fieldProvider)
     {
@@ -158,13 +150,7 @@ class Logger
         }
         catch (\Exception $ex)
         {
-            if (! $this->silent)
-            {
-                throw new $ex;
-            }
-
             return false;
         }
     }
-
 }

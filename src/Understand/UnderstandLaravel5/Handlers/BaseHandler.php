@@ -1,7 +1,5 @@
 <?php namespace Understand\UnderstandLaravel5\Handlers;
 
-use Understand\UnderstandLaravel5\Exceptions\HandlerException;
-
 abstract class BaseHandler
 {
 
@@ -18,13 +16,6 @@ abstract class BaseHandler
      * @var string
      */
     protected $apiUrl;
-
-    /**
-     * Specifies whether logger should throw an exception of issues detected
-     *
-     * @var bool
-     */
-    protected $silent = true;
 
     /**
      * SSL CA bundle path
@@ -44,16 +35,14 @@ abstract class BaseHandler
     /**
      * @param string $inputToken
      * @param string $apiUrl
-     * @param boolean $silent
      * @param string $sslBundlePath
      */
-    public function __construct($inputToken, $apiUrl, $silent = true, $sslBundlePath = null)
+    public function __construct($inputToken, $apiUrl, $sslBundlePath = null)
     {
         $this->setInputKey($inputToken);
         $this->setApiUrl($apiUrl);
 
         $this->sslBundlePath = $sslBundlePath;
-        $this->silent = $silent;
     }
 
     /**
@@ -68,7 +57,7 @@ abstract class BaseHandler
 
         $response = $this->send($json);
 
-        return $this->parseResponse($response, $requestData);
+        return $this->parseResponse($response);
     }
 
     /**
@@ -104,42 +93,11 @@ abstract class BaseHandler
     /**
      * Parse respnse into array
      *
-     * @param type $response
-     * @param string $requestData
+     * @param string $response
      * @return array
      */
-    protected function parseResponse($response, $requestData)
+    protected function parseResponse($response)
     {
-        $responseArr = json_decode($response, true);
-
-        if (!$this->silent && empty($responseArr['count']))
-        {
-            $this->handleError($responseArr, $requestData);
-        }
-
-        return $responseArr;
+        return json_decode($response, true);
     }
-
-    /**
-     * Transform error respopnse into exception
-     *
-     * @param string $responseArr
-     * @param string $requestData
-     * @throws HandlerException
-     */
-    protected function handleError($responseArr, $requestData)
-    {
-        if (!$responseArr)
-        {
-            throw new HandlerException('Cannot create connection to ' . $this->apiUrl);
-        }
-
-        if (isset($responseArr['error']))
-        {
-            throw new HandlerException($responseArr['error']);
-        }
-
-        throw new HandlerException('Error. ' . ' Request data: ' . json_decode($requestData));
-    }
-
 }

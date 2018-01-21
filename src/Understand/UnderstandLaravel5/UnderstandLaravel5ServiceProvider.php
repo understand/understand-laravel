@@ -4,7 +4,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\Str;
 use Illuminate\Foundation\Application;
-use Illuminate\Database\Eloquent\Model as EloquentModel;
+use Exception;
+use Throwable;
 
 class UnderstandLaravel5ServiceProvider extends ServiceProvider
 {
@@ -25,15 +26,16 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
 	{
         $configPath = __DIR__ . '/../../config/understand-laravel.php';
         $this->publishes([$configPath => config_path('understand-laravel.php')], 'config');
+        $enabled = $this->app['config']->get('understand-laravel.enabled');
 
-        if ($this->app['config']->get('understand-laravel.log_types.eloquent_log.enabled'))
-        {
-            $this->listenEloquentEvents();
-        }
-
-        if ($this->app['config']->get('understand-laravel.log_types.laravel_log.enabled'))
+        if ($enabled)
         {
             $this->listenLaravelEvents();
+        }
+
+        if ($enabled && $this->app['config']->get('understand-laravel.sql_enabled'))
+        {
+            $this->listenQueryEvents();
         }
 	}
 
@@ -46,11 +48,11 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
 	{
 		$this->registerConfig();
         $this->registerFieldProvider();
+        $this->registerDataCollector();
         $this->registerTokenProvider();
         $this->registerLogger();
-        $this->registerModelEventListenerProvider();
         $this->registerExceptionEncoder();
-        $this->registerExceptionLogger();
+        $this->registerEventLoggers();
 	}
 
     /**
@@ -71,18 +73,20 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
      */
     protected function registerFieldProvider()
     {
-        $this->app->bind('understand.field-provider', function($app)
+        $this->app->bind('understand.fieldProvider', function($app)
         {
             $fieldProvider = new FieldProvider();
 
-	    if ($app['config']['session.driver']) 
-	    {
+            if ($app['config']['session.driver'])
+            {
                 $fieldProvider->setSessionStore($app['session.store']);
             }
+
             $fieldProvider->setRouter($app['router']);
             $fieldProvider->setRequest($app['request']);
             $fieldProvider->setEnvironment($app->environment());
-            $fieldProvider->setTokenProvider($app['understand.token-provider']);
+            $fieldProvider->setTokenProvider($app['understand.tokenProvider']);
+            $fieldProvider->setDataCollector($app['understand.dataCollector']);
 
             return $fieldProvider;
         });
@@ -101,9 +105,22 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
      */
     protected function registerTokenProvider()
     {
-        $this->app->singleton('understand.token-provider', function()
+        $this->app->singleton('understand.tokenProvider', function()
         {
             return new TokenProvider();
+        });
+    }
+
+    /**
+     * Register data collector class
+     *
+     * @return void
+     */
+    protected function registerDataCollector()
+    {
+        $this->app->singleton('understand.dataCollector', function()
+        {
+            return new DataCollector();
         });
     }
 
@@ -114,25 +131,27 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
      */
     protected function registerExceptionEncoder()
     {
-        $this->app->bind('understand.exception-encoder', function()
+        $this->app->bind('understand.exceptionEncoder', function()
         {
             return new ExceptionEncoder;
         });
     }
 
     /**
-     * Register exception logger
+     * Register exception and event logger
      *
      * @return void
      */
-    protected function registerExceptionLogger()
+    protected function registerEventLoggers()
     {
+        $this->app->bind('understand.eventLogger', function($app)
+        {
+            return new EventLogger($app['understand.logger'], $app['config']);
+        });
+
         $this->app->bind('understand.exceptionLogger', function($app)
         {
-            $logger = $app['understand.logger'];
-            $encoder = $app['understand.exception-encoder'];
-
-            return new ExceptionLogger($logger, $encoder, $app['config']);
+            return new ExceptionLogger($app['understand.logger'], $app['understand.exceptionEncoder'], $app['config']);
         });
 
         $this->app->booting(function()
@@ -151,11 +170,10 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
     {
         $this->app->singleton('understand.logger', function($app)
         {
-            $fieldProvider = $app['understand.field-provider'];
+            $fieldProvider = $app['understand.fieldProvider'];
             $handler = $this->resolveHandler($app);
-            $silent = $app['config']->get('understand-laravel.silent');
 
-            return new Logger($fieldProvider, $handler, $silent);
+            return new Logger($fieldProvider, $handler);
         });
 
         $this->app->booting(function()
@@ -177,42 +195,20 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
         $inputToken = $app['config']->get('understand-laravel.token');
 
         $apiUrl = $app['config']->get('understand-laravel.url', 'https://api.understand.io');
-        $silent = $app['config']->get('understand-laravel.silent');
         $handlerType = $app['config']->get('understand-laravel.handler');
         $sslBundlePath = $app['config']->get('understand-laravel.ssl_ca_bundle');
 
         if ($handlerType == 'async')
         {
-            return new Handlers\AsyncHandler($inputToken, $apiUrl, $silent, $sslBundlePath);
+            return new Handlers\AsyncHandler($inputToken, $apiUrl, $sslBundlePath);
         }
 
         if ($handlerType == 'sync')
         {
-            return new Handlers\SyncHandler($inputToken, $apiUrl, $silent, $sslBundlePath);
-        }
-
-        if ($handlerType == 'queue')
-        {
-            return new Handlers\LaravelQueueHandler($inputToken, $apiUrl, $silent, $sslBundlePath);
+            return new Handlers\SyncHandler($inputToken, $apiUrl, $sslBundlePath);
         }
 
         throw new \ErrorException('understand-laravel handler misconfiguration:' . $handlerType);
-    }
-
-    /**
-     * Register model event listener provider
-     *
-     * @return void
-     */
-    protected function registerModelEventListenerProvider()
-    {
-        $this->app->bind('understand.model-event-listener-provider', function($app)
-        {
-            $logger = $app['understand.logger'];
-            $additional = $app['config']->get('understand-laravel.log_types.eloquent_log.meta', []);
-
-            return new ModelEventListener($logger, $additional);
-        });
     }
     
     /**
@@ -254,6 +250,38 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
     }
 
     /**
+     * Listen Query events
+     *
+     * @return void
+     */
+    protected function listenQueryEvents()
+    {
+        // only Laravel versions below L5.2 supports `illuminate.query`
+        if ($this->detectLaravelVersion(['5.0', '5.1']))
+        {
+            // $this->events->fire('illuminate.query', [$query, $bindings, $time, $this->getName()]);
+            $this->app['events']->listen('illuminate.query', function($query, $bindings, $time)
+            {
+                $this->app['understand.dataCollector']->setInArray('sql_queries', [
+                    'query' => $query,
+                    'time' => $time,
+                ]);
+            });
+        }
+        else
+        {
+            // https://laravel.com/api/5.3/Illuminate/Database/Events/QueryExecuted.html
+            $this->app['events']->listen('Illuminate\Database\Events\QueryExecuted', function($event)
+            {
+                $this->app['understand.dataCollector']->setInArray('sql_queries', [
+                    'query' => $event->sql,
+                    'time' => $event->time,
+                ]);
+            });
+        }
+    }
+
+    /**
      * Handle a new log event
      * 
      * @param string $level
@@ -263,77 +291,15 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
      */
     protected function handleEvent($level, $message, $context)
     {
-        $log = [];
-        
-        if ($message instanceof Exceptions\HandlerException)
+        // `info`, `debug` and NOT `\Exception` or `\Throwable`
+        if (in_array($level, ['info', 'debug']) && ! ($message instanceof Exception || $message instanceof Throwable))
         {
-            return;
+            $this->app['understand.eventLogger']->logEvent($level, $message, $context);
         }
-        else if ($message instanceof \Exception)
-        {
-            $log = $this->app['understand.exception-encoder']->exceptionToArray($message);
-            $log['tags'] = ['exception_log'];
-        }
-        // // integer, float, string or boolean as message
-        else if (is_scalar($message))
-        {
-            $log['message'] = $message;
-            $log['tags'] = ['laravel_log'];
-        }
+        // `notice`, `warning`, `error`, `critical`, `alert`, `emergency` and `\Exception`, `\Throwable`
         else
         {
-            $log = (array)$message;
-            $log['tags'] = ['laravel_log'];
-        }
-
-        if ($context)
-        {
-            $log['context'] = $context;
-        }
-
-        $log['level'] = $level;
-
-        $additional = $this->app['config']->get('understand-laravel.log_types.laravel_log.meta', []);
-        $this->app['understand.logger']->log($log, $additional);
-    }
-    
-    /**
-     * Listen eloquent model events and log them
-     *
-     * @return void
-     */
-    protected function listenEloquentEvents()
-    {
-        $modelLogger = $this->app['understand.model-event-listener-provider'];
-
-        $events = [
-            'eloquent.created*' => 'created',
-            'eloquent.updated*' => 'updated',
-            'eloquent.deleted*' => 'deleted',
-            'eloquent.restored*' => 'restored',
-        ];
-
-        foreach ($events as $listenerName => $eventName)
-        {
-            if ($this->detectLaravelVersion(['5.0', '5.1', '5.2', '5.3']))
-            {
-                $this->app['events']->listen($listenerName, function($model) use($modelLogger, $eventName)
-                {
-                    $modelLevelEventName = 'eloquent.' . $eventName . ': ' . get_class($model);
-                    
-                    $modelLogger->logModelEvent($eventName, $model, $modelLevelEventName);
-                });
-            }
-            else
-            {
-                $this->app['events']->listen($listenerName, function($modelLevelEventName, $eventPayload) use($modelLogger, $eventName)
-                {
-                    if (isset($eventPayload[0]) && $eventPayload[0] instanceof EloquentModel)
-                    {
-                        $modelLogger->logModelEvent($eventName, $eventPayload[0], $modelLevelEventName);
-                    }
-                });
-            }
+            $this->app['understand.exceptionLogger']->logError($level, $message, $context);
         }
     }
 
@@ -345,11 +311,13 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
     public function provides()
     {
         return [
-            'understand.field-provider',
+            'understand.fieldProvider',
             'understand.logger',
-            'understand.model-event-listener-provider',
-            'understand.exception-encoder',
-            'understand.exceptionLogger'
+            'understand.exceptionEncoder',
+            'understand.exceptionLogger',
+            'understand.eventLogger',
+            'understand.tokenProvider',
+            'understand.dataCollector',
         ];
     }
 }

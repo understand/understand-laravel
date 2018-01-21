@@ -4,6 +4,7 @@ use Understand\UnderstandLaravel5\UniqueProcessIdentifier;
 use \Illuminate\Session\Store AS SessionStore;
 use \Illuminate\Routing\Router;
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Application;
 
 class FieldProvider
 {
@@ -31,7 +32,8 @@ class FieldProvider
         'getEnvironment',
         'getFromSession',
         'getProcessIdentifier',
-        'getUserId'
+        'getUserId',
+        'getGroupId',
     ];
 
     /**
@@ -44,7 +46,7 @@ class FieldProvider
     /**
      * Router
      *
-     * @var Illuminate\Routing\Router
+     * @var Router
      */
     protected $router;
 
@@ -68,6 +70,11 @@ class FieldProvider
      * @var string
      */
     protected $environment;
+
+    /**
+     * @var DataCollector
+     */
+    protected $dataCollector;
 
     /**
      * Create field provider instance and set default providers to provider list
@@ -124,6 +131,14 @@ class FieldProvider
     }
 
     /**
+     * @param DataCollector $dataCollector
+     */
+    public function setDataCollector(DataCollector $dataCollector)
+    {
+        $this->dataCollector = $dataCollector;
+    }
+
+    /**
      * Register a custom HTML macro.
      *
      * @param string $name
@@ -149,9 +164,10 @@ class FieldProvider
      * Return resolved field-value array
      *
      * @param array $callbacks
+     * @param array $log
      * @return array
      */
-    public function resolveValues(array $callbacks)
+    public function resolveValues(array $callbacks, array $log)
     {
         $data = [];
 
@@ -163,7 +179,7 @@ class FieldProvider
             }
 
             $callback = array_get($caller, 0);
-            $args = array_get($caller, 1, []);
+            $args = [$log];
 
             $value = call_user_func_array($callback, $args);
 
@@ -210,6 +226,25 @@ class FieldProvider
         $hashed = sha1($sessionId);
 
         return $hashed;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getLaravelVersion()
+    {
+        return Application::VERSION;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getSqlQueries()
+    {
+        if ($this->dataCollector)
+        {
+            return $this->dataCollector->getByKey('sql_queries');
+        }
     }
 
     /**
@@ -340,6 +375,24 @@ class FieldProvider
         }
         
         return $this->session->get($key);
+    }
+
+    /**
+     * Return group id
+     *
+     * @param array $log
+     * @return string
+     */
+    protected function getGroupId(array $log)
+    {
+        $parts = [];
+
+        foreach(['class', 'file', 'line'] as $field)
+        {
+            $parts[] = isset($log[$field]) ? (string)$log[$field] : null;
+        }
+
+        return sha1(implode('#', $parts));
     }
 
     /**
