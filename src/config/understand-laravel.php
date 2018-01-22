@@ -8,9 +8,9 @@ return [
     'token' => env('UNDERSTAND_TOKEN'),
 
     /**
-     * Specifies whether logger should throw an exception of issues detected
+     * Enable/Disable Understand service provider
      */
-    'silent' => true,
+    'enabled' => env('UNDERSTAND_ENABLED', true),
 
     /**
      * Specify which handler to use - sync, queue or async. 
@@ -20,49 +20,18 @@ return [
      */
     'handler' => env('UNDERSTAND_HANDLER', 'sync'),
 
-    'log_types' => [
-        'eloquent_log' => [
-            'enabled' => false,
-            'meta' => [
-                'session_id' => 'UnderstandFieldProvider::getSessionId',
-                'request_id' => 'UnderstandFieldProvider::getProcessIdentifier',
-                'user_id' => 'UnderstandFieldProvider::getUserId',
-                'env' => 'UnderstandFieldProvider::getEnvironment',
-                'url' => 'UnderstandFieldProvider::getUrl',
-                'method' => 'UnderstandFieldProvider::getRequestMethod',
-                'client_ip' => 'UnderstandFieldProvider::getClientIp',
-            ]
-        ],
-        'laravel_log' => [
-            'enabled' => true,
-            'meta' => [
-                'session_id' => 'UnderstandFieldProvider::getSessionId',
-                'request_id' => 'UnderstandFieldProvider::getProcessIdentifier',
-                'user_id' => 'UnderstandFieldProvider::getUserId',
-                'env' => 'UnderstandFieldProvider::getEnvironment',
-                'url' => 'UnderstandFieldProvider::getUrl',
-                'method' => 'UnderstandFieldProvider::getRequestMethod',
-                'client_ip' => 'UnderstandFieldProvider::getClientIp',
-            ]
-        ],
-        'exception_log' => [
-            'enabled' => true,
-            'meta' => [
-                'session_id' => 'UnderstandFieldProvider::getSessionId',
-                'request_id' => 'UnderstandFieldProvider::getProcessIdentifier',
-                'user_id' => 'UnderstandFieldProvider::getUserId',
-                'env' => 'UnderstandFieldProvider::getEnvironment',
-                'url' => 'UnderstandFieldProvider::getUrl',
-                'method' => 'UnderstandFieldProvider::getRequestMethod',
-                'client_ip' => 'UnderstandFieldProvider::getClientIp',
-                'user_agent' => 'UnderstandFieldProvider::getClientUserAgent'
-            ]
-        ]
-    ],
+    /**
+     * Project root folder
+     */
+    'project_root' => base_path() . DIRECTORY_SEPARATOR,
+
+    /**
+     * Collect SQL queries without bindings
+     */
+    'sql_enabled' => true,
 
     /**
      * SSL CA Bundle location
      */
     'ssl_ca_bundle' => base_path('vendor/understand/understand-laravel5/src/ca_bundle.crt')
-
 ];

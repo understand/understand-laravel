@@ -36,7 +36,7 @@ class FieldProviderTest extends Orchestra\Testbench\TestCase
         
         \Illuminate\Support\Facades\Auth::shouldReceive('id')->once()->andReturn($userId);
         
-        $currentUserId = $this->app['understand.field-provider']->getUserId();
+        $currentUserId = $this->app['understand.fieldProvider']->getUserId();
         
         $this->assertSame($userId, $currentUserId);
     }
@@ -51,7 +51,7 @@ class FieldProviderTest extends Orchestra\Testbench\TestCase
         
         \Illuminate\Support\Facades\Auth::shouldReceive('getUser')->once()->andReturn($user);
         
-        $currentUserId = $this->app['understand.field-provider']->getUserId();
+        $currentUserId = $this->app['understand.fieldProvider']->getUserId();
 
         $this->assertSame($user->id, $currentUserId);
     }
@@ -66,7 +66,7 @@ class FieldProviderTest extends Orchestra\Testbench\TestCase
         
         \Illuminate\Support\Facades\Auth::shouldReceive('getUser')->once()->andReturn($user);
         
-        $currentUserId = $this->app['understand.field-provider']->getUserId();
+        $currentUserId = $this->app['understand.fieldProvider']->getUserId();
 
         $this->assertSame($user->id, $currentUserId);
     }

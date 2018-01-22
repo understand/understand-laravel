@@ -1,7 +1,7 @@
 {
     "name": "understand/understand-laravel5",
     "description": "Laravel 5 service provider for Understand.io",
-    "keywords": ["laravel", "undertstand.io", "understand", "logs", "laravel 5"],
+    "keywords": ["laravel", "understand.io", "understand", "logs", "laravel 5"],
     "license": "MIT",
     "authors": [
         {
@@ -29,7 +29,12 @@
         "frameworks": ["Laravel 5"],
         "branch-alias": {
 			"dev-master": "0.0-dev"
-		}
+		},
+        "laravel": {
+            "providers": [
+                "Understand\\UnderstandLaravel5\\UnderstandLaravel5ServiceProvider"
+            ]
+        }
     },
     "minimum-stability": "stable"
 }

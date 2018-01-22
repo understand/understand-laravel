@@ -4,6 +4,7 @@ use Understand\UnderstandLaravel5\UniqueProcessIdentifier;
 use \Illuminate\Session\Store AS SessionStore;
 use \Illuminate\Routing\Router;
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Application;
 
 class FieldProvider
 {
@@ -31,7 +32,13 @@ class FieldProvider
         'getEnvironment',
         'getFromSession',
         'getProcessIdentifier',
-        'getUserId'
+        'getUserId',
+        'getGroupId',
+        'getLaravelVersion',
+        'getSqlQueries',
+        'getArtisanCommandName',
+        'getRunningInConsole',
+        'getLoggerVersion',
     ];
 
     /**
@@ -44,7 +51,7 @@ class FieldProvider
     /**
      * Router
      *
-     * @var Illuminate\Routing\Router
+     * @var Router
      */
     protected $router;
 
@@ -70,9 +77,16 @@ class FieldProvider
     protected $environment;
 
     /**
-     * Create field provider instance and set default providers to provider list
-     *
-     * @param type $app
+     * @var DataCollector
+     */
+    protected $dataCollector;
+
+    /**
+     * @var Application
+     */
+    protected $app;
+
+    /**
      * @return void
      */
     public function __construct()
@@ -81,6 +95,14 @@ class FieldProvider
         {
             $this->extend($defaultProviderName, [$this, $defaultProviderName]);
         }
+    }
+
+    /**
+     * @param Application $app
+     */
+    public function setApp(Application $app)
+    {
+        $this->app = $app;
     }
 
     /**
@@ -124,6 +146,14 @@ class FieldProvider
     }
 
     /**
+     * @param DataCollector $dataCollector
+     */
+    public function setDataCollector(DataCollector $dataCollector)
+    {
+        $this->dataCollector = $dataCollector;
+    }
+
+    /**
      * Register a custom HTML macro.
      *
      * @param string $name
@@ -149,9 +179,10 @@ class FieldProvider
      * Return resolved field-value array
      *
      * @param array $callbacks
+     * @param array $log
      * @return array
      */
-    public function resolveValues(array $callbacks)
+    public function resolveValues(array $callbacks, array $log)
     {
         $data = [];
 
@@ -163,7 +194,7 @@ class FieldProvider
             }
 
             $callback = array_get($caller, 0);
-            $args = array_get($caller, 1, []);
+            $args = [$log];
 
             $value = call_user_func_array($callback, $args);
 
@@ -203,13 +234,32 @@ class FieldProvider
         {
             return null;
         }
-        
+
         $sessionId = $this->session->getId();
 
         // by default we provide only hashed version of session id
         $hashed = sha1($sessionId);
 
         return $hashed;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getLaravelVersion()
+    {
+        return Application::VERSION;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getSqlQueries()
+    {
+        if ($this->dataCollector)
+        {
+            return $this->dataCollector->getByKey('sql_queries');
+        }
     }
 
     /**
@@ -223,7 +273,7 @@ class FieldProvider
         {
             return null;
         }
-        
+
         return $this->router->getCurrentRoute()->getName();
     }
 
@@ -238,7 +288,7 @@ class FieldProvider
         {
             return null;
         }
-        
+
         $url = $this->request->path();
 
         if ( ! starts_with($url, '/'))
@@ -267,7 +317,7 @@ class FieldProvider
         {
             return null;
         }
-        
+
         return $this->request->method();
     }
 
@@ -282,7 +332,7 @@ class FieldProvider
         {
             return null;
         }
-        
+
         return $this->request->server->get('SERVER_ADDR');
     }
 
@@ -297,7 +347,7 @@ class FieldProvider
         {
             return null;
         }
-        
+
         return $this->request->getClientIp();
     }
 
@@ -312,7 +362,7 @@ class FieldProvider
         {
             return null;
         }
-        
+
         return $this->request->server->get('HTTP_USER_AGENT');
     }
 
@@ -338,8 +388,26 @@ class FieldProvider
         {
             return null;
         }
-        
+
         return $this->session->get($key);
+    }
+
+    /**
+     * Return group id
+     *
+     * @param array $log
+     * @return string
+     */
+    protected function getGroupId(array $log)
+    {
+        $parts = [];
+
+        foreach(['class', 'file', 'line'] as $field)
+        {
+            $parts[] = isset($log[$field]) ? (string)$log[$field] : null;
+        }
+
+        return sha1(implode('#', $parts));
     }
 
     /**
@@ -356,19 +424,19 @@ class FieldProvider
                 return $userId;
             }
         }
-        catch (\Exception $e) 
+        catch (\Exception $e)
         {}
 
-        try 
+        try
         {
             if (class_exists('\Sentinel') && ($user = \Sentinel::getUser()))
             {
                 return $user->id;
             }
-        } 
-        catch (\Exception $e) 
+        }
+        catch (\Exception $e)
         {}
-        
+
         try
         {
             if (class_exists('\Sentry') && ($user = \Sentry::getUser()))
@@ -376,8 +444,35 @@ class FieldProvider
                 return $user->id;
             }
         }
-        catch (\Exception $e) 
+        catch (\Exception $e)
         {}
+    }
+
+    /**
+     * @return string
+     */
+    protected function getArtisanCommandName()
+    {
+        if ($this->app->runningInConsole() && isset($_SERVER['argv']))
+        {
+            return implode(' ', $_SERVER['argv']);
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    protected function getRunningInConsole()
+    {
+        return $this->app->runningInConsole();
+    }
+
+    /**
+     * @return float
+     */
+    protected function getLoggerVersion()
+    {
+        return Logger::VERSION;
     }
 
     /**

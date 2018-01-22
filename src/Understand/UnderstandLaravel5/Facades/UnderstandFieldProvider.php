@@ -12,7 +12,7 @@ class UnderstandFieldProvider extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return 'understand.field-provider';
+        return 'understand.fieldProvider';
     }
 
 }
