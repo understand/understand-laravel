@@ -30,20 +30,6 @@ return [
      */
     'sql_enabled' => true,
 
-    // `\Log::info`, `\Log::debug` and NOT `\Exception` or `\Throwable`
-    'events' => [
-        'meta' => [
-            // ...
-        ]
-    ],
-
-    // `\Log::notice`, `\Log::warning`, `\Log::error`, `\Log::critical`, `\Log::alert`, `\Log::emergency` and `\Exception`, `\Throwable`
-    'errors' => [
-        'meta' => [
-            // ...
-        ]
-    ],
-
     /**
      * SSL CA Bundle location
      */
