@@ -30,14 +30,14 @@ return [
      */
     'sql_enabled' => true,
 
-    // `info`, `debug` and NOT `\Exception` or `\Throwable`
+    // `\Log::info`, `\Log::debug` and NOT `\Exception` or `\Throwable`
     'events' => [
         'meta' => [
             // ...
         ]
     ],
 
-    // `notice`, `warning`, `error`, `critical`, `alert`, `emergency` and `\Exception`, `\Throwable`
+    // `\Log::notice`, `\Log::warning`, `\Log::error`, `\Log::critical`, `\Log::alert`, `\Log::emergency` and `\Exception`, `\Throwable`
     'errors' => [
         'meta' => [
             // ...

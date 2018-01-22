@@ -7,6 +7,11 @@ class Logger
 {
 
     /**
+     * Version Number
+     */
+    const VERSION = 2.0;
+
+    /**
      * Field provider
      *
      * @var FieldProvider

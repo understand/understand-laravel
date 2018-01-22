@@ -34,6 +34,11 @@ class FieldProvider
         'getProcessIdentifier',
         'getUserId',
         'getGroupId',
+        'getLaravelVersion',
+        'getSqlQueries',
+        'getArtisanCommandName',
+        'getRunningInConsole',
+        'getLoggerVersion',
     ];
 
     /**
@@ -77,9 +82,11 @@ class FieldProvider
     protected $dataCollector;
 
     /**
-     * Create field provider instance and set default providers to provider list
-     *
-     * @param type $app
+     * @var Application
+     */
+    protected $app;
+
+    /**
      * @return void
      */
     public function __construct()
@@ -88,6 +95,14 @@ class FieldProvider
         {
             $this->extend($defaultProviderName, [$this, $defaultProviderName]);
         }
+    }
+
+    /**
+     * @param Application $app
+     */
+    public function setApp(Application $app)
+    {
+        $this->app = $app;
     }
 
     /**
@@ -219,7 +234,7 @@ class FieldProvider
         {
             return null;
         }
-        
+
         $sessionId = $this->session->getId();
 
         // by default we provide only hashed version of session id
@@ -258,7 +273,7 @@ class FieldProvider
         {
             return null;
         }
-        
+
         return $this->router->getCurrentRoute()->getName();
     }
 
@@ -273,7 +288,7 @@ class FieldProvider
         {
             return null;
         }
-        
+
         $url = $this->request->path();
 
         if ( ! starts_with($url, '/'))
@@ -302,7 +317,7 @@ class FieldProvider
         {
             return null;
         }
-        
+
         return $this->request->method();
     }
 
@@ -317,7 +332,7 @@ class FieldProvider
         {
             return null;
         }
-        
+
         return $this->request->server->get('SERVER_ADDR');
     }
 
@@ -332,7 +347,7 @@ class FieldProvider
         {
             return null;
         }
-        
+
         return $this->request->getClientIp();
     }
 
@@ -347,7 +362,7 @@ class FieldProvider
         {
             return null;
         }
-        
+
         return $this->request->server->get('HTTP_USER_AGENT');
     }
 
@@ -373,7 +388,7 @@ class FieldProvider
         {
             return null;
         }
-        
+
         return $this->session->get($key);
     }
 
@@ -409,19 +424,19 @@ class FieldProvider
                 return $userId;
             }
         }
-        catch (\Exception $e) 
+        catch (\Exception $e)
         {}
 
-        try 
+        try
         {
             if (class_exists('\Sentinel') && ($user = \Sentinel::getUser()))
             {
                 return $user->id;
             }
-        } 
-        catch (\Exception $e) 
+        }
+        catch (\Exception $e)
         {}
-        
+
         try
         {
             if (class_exists('\Sentry') && ($user = \Sentry::getUser()))
@@ -429,8 +444,35 @@ class FieldProvider
                 return $user->id;
             }
         }
-        catch (\Exception $e) 
+        catch (\Exception $e)
         {}
+    }
+
+    /**
+     * @return string
+     */
+    protected function getArtisanCommandName()
+    {
+        if ($this->app->runningInConsole() && isset($_SERVER['argv']))
+        {
+            return implode(' ', $_SERVER['argv']);
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    protected function getRunningInConsole()
+    {
+        return $this->app->runningInConsole();
+    }
+
+    /**
+     * @return float
+     */
+    protected function getLoggerVersion()
+    {
+        return Logger::VERSION;
     }
 
     /**

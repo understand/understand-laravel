@@ -138,6 +138,9 @@ class ExceptionLogger
             'user_agent' => 'UnderstandFieldProvider::getClientUserAgent',
             'laravel_version' => 'UnderstandFieldProvider::getLaravelVersion',
             'sql_queries' => 'UnderstandFieldProvider::getSqlQueries',
+            'artisan_command' => 'UnderstandFieldProvider::getArtisanCommandName',
+            'console' => 'UnderstandFieldProvider::getRunningInConsole',
+            'logger_version' => 'UnderstandFieldProvider::getLoggerVersion',
         ];
     }
 

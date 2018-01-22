@@ -87,6 +87,7 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
             $fieldProvider->setEnvironment($app->environment());
             $fieldProvider->setTokenProvider($app['understand.tokenProvider']);
             $fieldProvider->setDataCollector($app['understand.dataCollector']);
+            $fieldProvider->setApp($app);
 
             return $fieldProvider;
         });
@@ -291,12 +292,12 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
      */
     protected function handleEvent($level, $message, $context)
     {
-        // `info`, `debug` and NOT `\Exception` or `\Throwable`
+        // `\Log::info`, `\Log::debug` and NOT `\Exception` or `\Throwable`
         if (in_array($level, ['info', 'debug']) && ! ($message instanceof Exception || $message instanceof Throwable))
         {
             $this->app['understand.eventLogger']->logEvent($level, $message, $context);
         }
-        // `notice`, `warning`, `error`, `critical`, `alert`, `emergency` and `\Exception`, `\Throwable`
+        // `\Log::notice`, `\Log::warning`, `\Log::error`, `\Log::critical`, `\Log::alert`, `\Log::emergency` and `\Exception`, `\Throwable`
         else
         {
             $this->app['understand.exceptionLogger']->logError($level, $message, $context);
