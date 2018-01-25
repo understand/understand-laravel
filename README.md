@@ -76,7 +76,7 @@ If you see instructions on how to use CURL then your system has the CURL binary 
 
 Laravel's (`>= 5.0, < 5.1`) exception logger doesn't use event dispatcher (https://github.com/laravel/framework/pull/10922) and that's why you need to add the following line to your `Handler.php` file (otherwise Laravel's exceptions will not be sent Understand.io).
 
-- Open `app/Exceptions/Handler.php` and put this line `\UnderstandExceptionLogger::log($e)` inside `report``method.
+- Open `app/Exceptions/Handler.php` and put this line `\UnderstandExceptionLogger::log($e)` inside `report` method.
   
   ```php
   public function report(Exception $e)
