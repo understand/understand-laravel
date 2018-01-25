@@ -5,7 +5,6 @@
 [![Total Downloads](https://poser.pugx.org/understand/understand-laravel5/downloads)](https://packagist.org/packages/understand/understand-laravel5)
 [![Latest Unstable Version](https://poser.pugx.org/understand/understand-laravel5/v/unstable.svg)](https://packagist.org/packages/understand/understand-laravel5) 
 [![License](https://poser.pugx.org/understand/understand-laravel5/license.svg)](https://packagist.org/packages/understand/understand-laravel5)
-[![HHVM Status](http://hhvm.h4cc.de/badge/understand/understand-laravel5.svg)](http://hhvm.h4cc.de/package/understand/understand-laravel5)
 
 > You may also be interested in our [Laravel 4](https://github.com/understand/understand-laravel), [Laravel Lumen service provider](https://github.com/understand/understand-lumen) or [Monolog Understand.io handler](https://github.com/understand/understand-monolog)
 
