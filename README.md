@@ -19,7 +19,7 @@ This packages provides a full abstraction for Understand.io and provides extra f
 1. Add package to your project.
     
     ```
-    composer require understand/understand-laravel5
+    composer require understand/understand-laravel5:^2
     ```
 
 2. Add the ServiceProvider to the providers array in ```config/app.php```
