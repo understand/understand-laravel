@@ -31,6 +31,13 @@ UNDERSTAND_ENABLED=true
 UNDERSTAND_TOKEN=your-input-token-from-understand-io
 ```
 
+4. Send your first error
+
+```php 
+// anywhere inside your Laravel app
+\Log::error('Understand.io test error');
+```
+
 - We recommend that you make use of a async handler - [How to send data asynchronously](#how-to-send-data-asynchronously)  
 - If you are using Laravel 5.0 (`>= 5.0, < 5.1`) version, please read about - [How to report Laravel 5.0 exceptions](#how-to-report-laravel-50--50--51-exceptions).
 - For advanced configuration please read about - [Advanced configuration](#advanced-configuration)
