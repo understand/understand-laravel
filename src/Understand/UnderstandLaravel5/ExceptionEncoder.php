@@ -187,7 +187,10 @@ class ExceptionEncoder
             {
                 $file->next();
                 // `key()` returns 0 as the first line
-                $codeLines[$file->key() + 1] = rtrim($file->current());
+                $codeLines[] = [
+                    'line' => $file->key() + 1,
+                    'code' => rtrim($file->current())
+                ];
             }
 
             return $codeLines;
