@@ -14,8 +14,8 @@ class TestFileReaderTest extends PHPUnit_Framework_TestCase
 
         $result = $encoder->getCode('TestFile.txt', 5, 0);
 
-        $this->assertTrue(isset($result[5]));
-        $this->assertSame('Line 4', $result[5]);
+        $this->assertTrue(isset($result[0]['code']));
+        $this->assertSame('Line 4', $result[0]['code']);
     }
 
     public function testCodeReaderLinesAround()
@@ -28,9 +28,9 @@ class TestFileReaderTest extends PHPUnit_Framework_TestCase
 
         $result = $encoder->getCode('TestFile.txt', 5, 2);
 
-        foreach($result as $key => $value)
+        foreach($result as $value)
         {
-            $this->assertSame('Line ' . ($key - 1), $value);
+            $this->assertSame('Line ' . ($value['line'] - 1), $value['code']);
         }
     }
 }
