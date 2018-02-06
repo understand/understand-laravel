@@ -82,7 +82,7 @@ class ExceptionEncoder
      */
     protected function getCurrentStackTrace()
     {
-        $stackTrace = debug_backtrace();
+        $stackTrace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 100);
         $vendorExcluded = false;
 
         foreach($stackTrace as $index => $trace)
