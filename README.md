@@ -6,6 +6,9 @@
 [![Latest Unstable Version](https://poser.pugx.org/understand/understand-laravel5/v/unstable.svg)](https://packagist.org/packages/understand/understand-laravel5) 
 [![License](https://poser.pugx.org/understand/understand-laravel5/license.svg)](https://packagist.org/packages/understand/understand-laravel5)
 
+- [Quick start](#quick-start)  
+- [Upgrading To Version 2](#upgrading-to-version-2-of-the-service-provider)
+
 ### Introduction
 
 This packages provides a full abstraction for Understand.io and provides extra features to improve Laravel's default logging capabilities. It is essentially a wrapper around Laravel's event handler to take full advantage of Understand.io's data aggregation and analysis capabilities.
@@ -24,7 +27,7 @@ composer require understand/understand-laravel5:^2
 Understand\UnderstandLaravel5\UnderstandLaravel5ServiceProvider::class,
 ```
 
-3. Set your Understand.io input key in your `.env` file
+3. Set your Understand.io input token in your `.env` file
   
 ```php
 UNDERSTAND_ENABLED=true
@@ -105,12 +108,17 @@ php artisan vendor:publish --provider="Understand\UnderstandLaravel5\UnderstandL
 
 ### Upgrading To Version 2 of the Service Provider
 
-1. Add the following configuration variable to your `.env` file.
+1. Update your `package.json` file, change the version of `understand/understand-laravel5` package and run `composer update understand/understand-laravel5`.
+```json
+"understand/understand-laravel5": "^2.0",
+```
+
+2. Add the following configuration variable to your `.env` file.
 ```php
 UNDERSTAND_ENABLED=true
 ```
 
-2. If you previously created a `understand-laravel.php` config file in your `config` directory, please delete it and follow [Advanced configuration](#advanced-configuration) steps to publish a new version if necessary.
+3. If you previously created a `understand-laravel.php` config file in your `config` directory, please delete it and follow [Advanced configuration](#advanced-configuration) steps to publish a new version if necessary.
 
 ### Requirements 
 ##### UTF-8
