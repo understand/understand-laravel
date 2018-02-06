@@ -1,16 +1,39 @@
 <?php namespace Understand\UnderstandLaravel5;
 
+use Exception;
+use Throwable;
+use InvalidArgumentException;
+use SplFileObject;
+
 class ExceptionEncoder
 {
 
     /**
+     * @var string
+     */
+    protected $projectRoot;
+
+    /**
+     * @param string $projectRoot
+     */
+    public function setProjectRoot($projectRoot)
+    {
+        $this->projectRoot = $projectRoot;
+    }
+
+    /**
      * Serialize exception object
      *
-     * @param \Exception $exception
-     * @return type
+     * @param mixed $exception
+     * @return array
      */
-    public function exceptionToArray(\Exception $exception)
+    public function exceptionToArray($exception)
     {
+        if ( ! ($exception instanceof Exception || $exception instanceof Throwable))
+        {
+            throw new InvalidArgumentException('$exception must be instance of Exception or Throwable');
+        }
+
         $trace = $exception->getTrace();
         $className = get_class($exception);
         $message = $exception->getMessage() ? $exception->getMessage() : $className;
@@ -19,10 +42,79 @@ class ExceptionEncoder
             'message' => $message,
             'class' => $className,
             'code' => $exception->getCode(),
-            'file' => $exception->getFile(),
+            'file' => $this->removeProjectRoot($exception->getFile()),
             'line' => $exception->getLine(),
-            'stack' => $this->stackTraceToArray($trace)
+            'stack' => $this->stackTraceToArray($trace, $exception->getFile(), $exception->getLine())
         ];
+    }
+
+    /**
+     * @param array $errorLog
+     * @return array
+     */
+    public function setCurrentStackTrace(array $errorLog)
+    {
+        $level = isset($errorLog['level']) ? $errorLog['level'] : null;
+        $stackTrace = $this->getCurrentStackTrace($level);
+        $firstLineSet = false;
+
+        foreach($stackTrace as $trace)
+        {
+            if ($firstLineSet)
+            {
+                break;
+            }
+
+            $firstLineSet = true;
+
+            $errorLog['class'] = null;
+            $errorLog['file'] = isset($trace['file']) ? $trace['file'] : null;
+            $errorLog['line'] = isset($trace['line']) ? $trace['line'] : null;
+        }
+
+        $errorLog['stack'] = $stackTrace;
+
+        return $errorLog;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getCurrentStackTrace()
+    {
+        $stackTrace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 100);
+        $vendorExcluded = false;
+
+        foreach($stackTrace as $index => $trace)
+        {
+            // exclude Understand service provider and helper classes
+            if (isset($trace['class']) && strpos($trace['class'], 'Understand\UnderstandLaravel5\\') === 0)
+            {
+                unset($stackTrace[$index]);
+            }
+
+            if ( ! isset($trace['file']))
+            {
+                $vendorExcluded = true;
+            }
+
+            if ($vendorExcluded)
+            {
+                continue;
+            }
+
+            // exclude `vendor` folder until project path reached
+            if (strpos($trace['file'], $this->projectRoot . 'vendor' . DIRECTORY_SEPARATOR) === 0)
+            {
+                unset($stackTrace[$index]);
+            }
+            else
+            {
+                $vendorExcluded = true;
+            }
+        }
+
+        return $this->stackTraceToArray($stackTrace);
     }
 
     /**
@@ -31,12 +123,22 @@ class ExceptionEncoder
      * @param array $stackTrace
      * @return array
      */
-    public function stackTraceToArray(array $stackTrace)
+    public function stackTraceToArray(array $stackTrace, $topFile = null, $topLine = null)
     {
         $stack = [];
 
         foreach ($stackTrace as $trace)
         {
+            // Exception object `getTrace` does not return file and line number for the first line
+            // http://php.net/manual/en/exception.gettrace.php#107563
+            if (isset($topFile, $topLine) && $topFile && $topLine)
+            {
+                $trace['file'] = $topFile;
+                $trace['line'] = $topLine;
+
+                unset($topFile, $topLine);
+            }
+
             $type = $this->stackTraceCallToString($trace);
             $args = $this->stackTraceArgsToArray($trace);
 
@@ -46,11 +148,55 @@ class ExceptionEncoder
                 'args' => $args,
                 'type' => $type,
                 'file' => $this->getStackTraceFile($trace),
-                'line' => $this->getStackTraceLine($trace)
+                'line' => $this->getStackTraceLine($trace),
+                'code' => $this->getCode($this->getStackTraceFile($trace), $this->getStackTraceLine($trace)),
             ];
         }
 
         return $stack;
+    }
+
+    /**
+     * @param $relativePath
+     * @param $line
+     * @param int $linesAround
+     * @return array|void
+     */
+    public function getCode($relativePath, $line, $linesAround = 6)
+    {
+        if ( ! $relativePath || ! $line)
+        {
+            return;
+        }
+
+        $filePath = $this->projectRoot . $relativePath;
+
+        try
+        {
+            $file = new SplFileObject($filePath);
+            $file->setMaxLineLen(250);
+            $file->seek(PHP_INT_MAX);
+            $codeLines = [];
+
+            $from = max(0, $line - $linesAround - 2);
+            $to = min($line + $linesAround -1, $file->key() + 1);
+
+            $file->seek($from);
+
+            while ($file->key() < $to && ! $file->eof())
+            {
+                $file->next();
+                // `key()` returns 0 as the first line
+                $codeLines[] = [
+                    'line' => $file->key() + 1,
+                    'code' => rtrim($file->current())
+                ];
+            }
+
+            return $codeLines;
+        }
+        catch (\Exception $e)
+        {}
     }
 
     /**
@@ -77,7 +223,7 @@ class ExceptionEncoder
     {
         if (isset($trace['file']))
         {
-            return $trace['file'];
+            return $this->removeProjectRoot($trace['file']);
         }
     }
 
@@ -159,4 +305,15 @@ class ExceptionEncoder
         return $params;
     }
 
+    /**
+     * @param $path
+     * @return string
+     */
+    protected function removeProjectRoot($path)
+    {
+        if (substr($path, 0, strlen($this->projectRoot)) == $this->projectRoot)
+        {
+            return substr($path, strlen($this->projectRoot));
+        }
+    }
 }

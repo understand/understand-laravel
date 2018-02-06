@@ -38,7 +38,7 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
             $laravelLogTag = in_array('exception_log', $decoded['tags'], true);
         };
 
-        $fieldProvider = $this->app['understand.field-provider'];
+        $fieldProvider = $this->app['understand.fieldProvider'];
         $handler = new CallbackHandler($callback);
 
         $this->app['understand.logger'] = new Logger($fieldProvider, $handler, false);
@@ -66,7 +66,7 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
             $laravelLogTag = in_array('exception_log', $decoded['tags'], true);
         };
 
-        $fieldProvider = $this->app['understand.field-provider'];
+        $fieldProvider = $this->app['understand.fieldProvider'];
         $handler = new CallbackHandler($callback);
 
         $this->app['understand.logger'] = new Logger($fieldProvider, $handler, false);
@@ -94,10 +94,10 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
             $called++;
             $decoded = json_decode($data, true);
 
-            $exceptionLogTag = in_array('exception_log', $decoded['tags'], true);
+            $exceptionLogTag = in_array('error_log', $decoded['tags'], true);
         };
 
-        $fieldProvider = $this->app['understand.field-provider'];
+        $fieldProvider = $this->app['understand.fieldProvider'];
         $handler = new CallbackHandler($callback);
 
         $this->app['understand.logger'] = new Logger($fieldProvider, $handler, false);
@@ -116,8 +116,8 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
      */
     public function testTokenProviderValue()
     {
-        $token = $this->app['understand.token-provider']->getToken();
-        $token2 = $this->app['understand.token-provider']->getToken();
+        $token = $this->app['understand.tokenProvider']->getToken();
+        $token2 = $this->app['understand.tokenProvider']->getToken();
             
         $this->assertNotEmpty($token2);
         $this->assertSame($token2, $token);
@@ -142,7 +142,7 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
             $laravelLogTag = in_array('exception_log', $decoded['tags'], true);
         };
 
-        $fieldProvider = $this->app['understand.field-provider'];
+        $fieldProvider = $this->app['understand.fieldProvider'];
         $handler = new CallbackHandler($callback);
 
         $this->app['understand.logger'] = new Logger($fieldProvider, $handler, false);
@@ -172,7 +172,7 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
             $laravelLogTag = in_array('exception_log', $decoded['tags'], true);
         };
 
-        $fieldProvider = $this->app['understand.field-provider'];
+        $fieldProvider = $this->app['understand.fieldProvider'];
         $handler = new CallbackHandler($callback);
 
         $this->app['understand.logger'] = new Logger($fieldProvider, $handler, false);
@@ -202,7 +202,7 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
             $laravelLogTag = in_array('exception_log', $decoded['tags'], true);
         };
 
-        $fieldProvider = $this->app['understand.field-provider'];
+        $fieldProvider = $this->app['understand.fieldProvider'];
         $handler = new CallbackHandler($callback);
 
         $this->app['understand.logger'] = new Logger($fieldProvider, $handler, false);

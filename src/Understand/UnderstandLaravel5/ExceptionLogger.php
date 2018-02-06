@@ -1,8 +1,8 @@
 <?php namespace Understand\UnderstandLaravel5;
 
-use Understand\UnderstandLaravel5\ExceptionEncoder;
-use Understand\UnderstandLaravel5\Logger;
 use Illuminate\Config\Repository;
+use Exception;
+use Throwable;
 
 class ExceptionLogger
 {
@@ -42,30 +42,114 @@ class ExceptionLogger
         $this->logger = $logger;
         $this->encoder = $encoder;
         $this->config = $config;
+
+        $this->encoder->setProjectRoot($this->config->get('understand-laravel.project_root'));
     }
 
     /**
      * Send PHP exception to Understand.io
      *
-     * @param \Exception $exception
+     * @deprecated
+     * @param mixed $error
      * @return void
      */
-    public function log(\Exception $exception)
+    public function log($error)
     {
-        if ($exception instanceof Exceptions\HandlerException)
+        if ( ! $this->canHandle($error))
         {
             return;
         }
 
-        if ( ! $this->config->get('understand-laravel.log_types.exception_log.enabled'))
+        $errorArr = $this->encoder->exceptionToArray($error);
+
+        return $this->dispatch($errorArr);
+    }
+
+    /**
+     * @param string $level
+     * @param mixed $message
+     * @param mixed $context
+     * @return void
+     */
+    public function logError($level, $message, $context)
+    {
+        if ( ! $this->canHandle($message))
         {
             return;
         }
 
-        $exceptionArr = $this->encoder->exceptionToArray($exception);
-        $exceptionArr['tags'] = ['exception_log'];
-        $additional = $this->config->get('understand-laravel.log_types.exception_log.meta', []);
+        if ($message instanceof Exception || $message instanceof Throwable)
+        {
+            $log = $this->encoder->exceptionToArray($message);
+        }
+        // integer, float, string or boolean as message
+        else if (is_scalar($message))
+        {
+            $log = [
+                'message' => $message
+            ];
 
-        $this->logger->log($exceptionArr, $additional);
+            $log = $this->encoder->setCurrentStackTrace($log);
+        }
+        else
+        {
+            $log = (array)$message;
+            $log = $this->encoder->setCurrentStackTrace($log);
+        }
+
+        $log['level'] = $level;
+
+        if ($context)
+        {
+            $log['context'] = (array)$context;
+        }
+
+        return $this->dispatch($log);
+    }
+
+    /**
+     * @param array $errorArr
+     * @return array
+     */
+    protected function dispatch(array $errorArr)
+    {
+        $errorArr['tags'] = ['error_log'];
+
+        $additionalFields = $this->getMetaFields();
+        $customFields = $this->config->get('understand-laravel.errors.meta', []);
+
+        return $this->logger->log($errorArr, $additionalFields, $customFields);
+    }
+
+    /**
+     * @return array
+     */
+    protected function getMetaFields()
+    {
+        return [
+            'session_id' => 'UnderstandFieldProvider::getSessionId',
+            'request_id' => 'UnderstandFieldProvider::getProcessIdentifier',
+            'group_id' => 'UnderstandFieldProvider::getGroupId',
+            'user_id' => 'UnderstandFieldProvider::getUserId',
+            'env' => 'UnderstandFieldProvider::getEnvironment',
+            'url' => 'UnderstandFieldProvider::getUrl',
+            'method' => 'UnderstandFieldProvider::getRequestMethod',
+            'client_ip' => 'UnderstandFieldProvider::getClientIp',
+            'user_agent' => 'UnderstandFieldProvider::getClientUserAgent',
+            'laravel_version' => 'UnderstandFieldProvider::getLaravelVersion',
+            'sql_queries' => 'UnderstandFieldProvider::getSqlQueries',
+            'artisan_command' => 'UnderstandFieldProvider::getArtisanCommandName',
+            'console' => 'UnderstandFieldProvider::getRunningInConsole',
+            'logger_version' => 'UnderstandFieldProvider::getLoggerVersion',
+        ];
+    }
+
+    /**
+     * @param mixed $error
+     * @return bool
+     */
+    protected function canHandle($error)
+    {
+        return (bool)$this->config->get('understand-laravel.enabled');
     }
 }
