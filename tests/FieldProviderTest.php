@@ -70,4 +70,13 @@ class FieldProviderTest extends Orchestra\Testbench\TestCase
 
         $this->assertSame($user->id, $currentUserId);
     }
+
+    public function testQueryCount()
+    {
+        $this->app['understand.dataCollector']->set('sql_queries', range(1, 1000));
+
+        $queries = $this->app['understand.fieldProvider']->getSqlQueries();
+
+        $this->assertCount(500, $queries);
+    }
 }
