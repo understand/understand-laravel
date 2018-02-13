@@ -100,4 +100,21 @@ class ExceptionEncoderTest extends PHPUnit_Framework_TestCase
 
         $this->assertSame('object(__PHP_Incomplete_Class)', $stackTraceArray[$index]['args'][0]);
     }
+
+    public function testStackTraceLimit()
+    {
+        $exception = new \DomainException;
+
+        $encoder = new Understand\UnderstandLaravel5\ExceptionEncoder();
+
+        $originalStackTrace = $exception->getTrace();
+        $stackTraceArray = $encoder->stackTraceToArray($originalStackTrace);
+
+        $this->assertTrue(count($stackTraceArray) > 2);
+
+        $encoder->setStackTraceLimit(2);
+        $stackTraceArray2 = $encoder->stackTraceToArray($originalStackTrace);
+
+        $this->assertTrue(count($stackTraceArray2) === 2);
+    }
 }

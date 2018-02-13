@@ -14,6 +14,19 @@ class ExceptionEncoder
     protected $projectRoot;
 
     /**
+     * @var int
+     */
+    protected $stackTraceLimit = 100;
+
+    /**
+     * @param integer $limit
+     */
+    public function setStackTraceLimit($limit)
+    {
+        $this->stackTraceLimit = $limit;
+    }
+
+    /**
      * @param string $projectRoot
      */
     public function setProjectRoot($projectRoot)
@@ -126,6 +139,7 @@ class ExceptionEncoder
     public function stackTraceToArray(array $stackTrace, $topFile = null, $topLine = null)
     {
         $stack = [];
+        $counter = 0;
 
         foreach ($stackTrace as $trace)
         {
@@ -151,6 +165,13 @@ class ExceptionEncoder
                 'line' => $this->getStackTraceLine($trace),
                 'code' => $this->getCode($this->getStackTraceFile($trace), $this->getStackTraceLine($trace)),
             ];
+
+            $counter++;
+
+            if ($counter >= $this->stackTraceLimit)
+            {
+                break;
+            }
         }
 
         return $stack;

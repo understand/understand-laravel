@@ -256,10 +256,17 @@ class FieldProvider
      */
     protected function getSqlQueries()
     {
-        if ($this->dataCollector)
+        if ( ! $this->dataCollector)
         {
-            return $this->dataCollector->getByKey('sql_queries');
+            return [];
         }
+
+        if ($queries = $this->dataCollector->getByKey('sql_queries'))
+        {
+            return array_slice($queries, -500);
+        }
+
+        return [];
     }
 
     /**
