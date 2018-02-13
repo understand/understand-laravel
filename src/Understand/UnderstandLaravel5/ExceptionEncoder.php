@@ -95,7 +95,7 @@ class ExceptionEncoder
      */
     protected function getCurrentStackTrace()
     {
-        $stackTrace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 100);
+        $stackTrace = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, $this->stackTraceLimit);
         $vendorExcluded = false;
 
         foreach($stackTrace as $index => $trace)
