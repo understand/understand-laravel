@@ -263,7 +263,7 @@ class FieldProvider
 
         if ($queries = $this->dataCollector->getByKey('sql_queries'))
         {
-            return array_slice($queries, -500);
+            return array_slice($queries, -100);
         }
 
         return [];
