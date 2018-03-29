@@ -77,6 +77,6 @@ class FieldProviderTest extends Orchestra\Testbench\TestCase
 
         $queries = $this->app['understand.fieldProvider']->getSqlQueries();
 
-        $this->assertCount(500, $queries);
+        $this->assertCount(100, $queries);
     }
 }
