@@ -292,6 +292,11 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
      */
     protected function handleEvent($level, $message, $context)
     {
+        if ($this->shouldIgnoreEvent($level, $message, $context))
+        {
+            return;
+        }
+
         // `\Log::info`, `\Log::debug` and NOT `\Exception` or `\Throwable`
         if (in_array($level, ['info', 'debug']) && ! ($message instanceof Exception || $message instanceof Throwable))
         {
@@ -309,6 +314,24 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
         {
             $this->app['understand.exceptionLogger']->logError($level, $message, $context);
         }
+    }
+
+    /**
+     * @param $level
+     * @param $message
+     * @param $context
+     * @return bool
+     */
+    protected function shouldIgnoreEvent($level, $message, $context)
+    {
+        $ignoredEventTypes = (array)$this->app['config']->get('understand-laravel.ignored_logs');
+
+        if ( ! $ignoredEventTypes)
+        {
+            return false;
+        }
+
+        return in_array($level, $ignoredEventTypes, true);
     }
 
     /**
