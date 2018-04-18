@@ -48,6 +48,36 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
         $this->assertSame($called, 1);
         $this->assertTrue($messageSame);
     }
+
+    /**
+     * Test event listener
+     *
+     * @return void
+     */
+    public function testIgnoredLogsConfig()
+    {
+        $called = 0;
+
+        $callback = function($data) use(&$called)
+        {
+            $called++;
+        };
+
+        $this->app['config']->set('understand-laravel.ignored_logs', ['debug', 'notice']);
+
+        $handler = new CallbackHandler($callback);
+        $this->app['understand.logger'] = new Logger($this->app['understand.fieldProvider'], $handler, false);
+
+        // debug and notice should be ignored
+        $this->app['Psr\Log\LoggerInterface']->debug('test');
+        $this->app['Psr\Log\LoggerInterface']->notice('test');
+
+        // error and alert should reach the logger
+        $this->app['Psr\Log\LoggerInterface']->error('test');
+        $this->app['Psr\Log\LoggerInterface']->alert('test');
+
+        $this->assertSame($called, 2);
+    }
     
     /**
      * Test error handler logging
