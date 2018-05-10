@@ -153,6 +153,10 @@ class Logger
         {
             return $this->handler->handle($event);
         }
+        catch (\Throwable $e)
+        {
+            return false;
+        }
         catch (\Exception $ex)
         {
             return false;
