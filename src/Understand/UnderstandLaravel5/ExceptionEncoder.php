@@ -216,6 +216,8 @@ class ExceptionEncoder
 
             return $codeLines;
         }
+        catch (\Throwable $e)
+        {}
         catch (\Exception $e)
         {}
     }

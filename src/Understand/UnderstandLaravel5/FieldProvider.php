@@ -431,6 +431,8 @@ class FieldProvider
                 return $userId;
             }
         }
+        catch (\Throwable $e)
+        {}
         catch (\Exception $e)
         {}
 
@@ -441,6 +443,8 @@ class FieldProvider
                 return $user->id;
             }
         }
+        catch (\Throwable $e)
+        {}
         catch (\Exception $e)
         {}
 
@@ -451,6 +455,8 @@ class FieldProvider
                 return $user->id;
             }
         }
+        catch (\Throwable $e)
+        {}
         catch (\Exception $e)
         {}
     }
