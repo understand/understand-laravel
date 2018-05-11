@@ -29,7 +29,7 @@ class FieldProviderTest extends Orchestra\Testbench\TestCase
 
         $this->assertSame($value, $fieldProvider->{$method}());
     }
-    
+
     public function testLaravelAuth()
     {
         $userId = 23452345;
@@ -69,6 +69,18 @@ class FieldProviderTest extends Orchestra\Testbench\TestCase
         $currentUserId = $this->app['understand.fieldProvider']->getUserId();
 
         $this->assertSame($user->id, $currentUserId);
+    }
+
+    public function testFieldProviderThrowsAnException()
+    {
+        $loader = AliasLoader::getInstance();
+        $loader->alias('Sentry', '\Illuminate\Support\Facades\Auth');
+
+        \Illuminate\Support\Facades\Auth::shouldReceive('getUser')->andThrow('Exception');
+
+        $currentUserId = $this->app['understand.fieldProvider']->getUserId();
+
+        $this->assertNull($currentUserId);
     }
 
     public function testQueryCount()
