@@ -1,6 +1,8 @@
 <?php
 
-class ExceptionEncoderTest extends PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class ExceptionEncoderTest extends TestCase
 {
     public function testExceptionObjectResult()
     {
@@ -98,7 +100,14 @@ class ExceptionEncoderTest extends PHPUnit_Framework_TestCase
         $encoder = new Understand\UnderstandLaravel5\ExceptionEncoder();
         $stackTraceArray = $encoder->stackTraceToArray($exception->getTrace());
 
-        $this->assertSame('object(__PHP_Incomplete_Class)', $stackTraceArray[$index]['args'][0]);
+        if (starts_with(phpversion(), '7.2'))
+        {
+            $this->assertSame('__PHP_Incomplete_Class', $stackTraceArray[$index]['args'][0]);
+        }
+        else
+        {
+            $this->assertSame('object(__PHP_Incomplete_Class)', $stackTraceArray[$index]['args'][0]);
+        }
     }
 
     public function testStackTraceLimit()
