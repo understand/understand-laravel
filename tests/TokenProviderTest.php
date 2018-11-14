@@ -1,6 +1,8 @@
 <?php
 
-class TokenProviderTest extends PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class TokenProviderTest extends TestCase
 {
     public function testRandomToken()
     {

@@ -303,7 +303,7 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
             $this->app['understand.eventLogger']->logEvent($level, $message, $context);
         }
         // `\Log::notice`, `\Log::warning`, `\Log::error`, `\Log::critical`, `\Log::alert`, `\Log::emergency` and `\Exception`, `\Throwable`
-        else if ($this->detectLaravelVersion(['5.6']) && isset($context['exception']) && ($context['exception'] instanceof Exception || $context['exception'] instanceof Throwable))
+        else if ($this->detectLaravelVersion(['5.6', '5.7']) && isset($context['exception']) && ($context['exception'] instanceof Exception || $context['exception'] instanceof Throwable))
         {
             $exception = $context['exception'];
             unset($context['exception']);

@@ -93,6 +93,8 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
             $called++;
             $decoded = json_decode($data, true);
 
+            $this->assertEquals('EventListenerTest', $decoded['stack'][0]['class']);
+
             $laravelLogTag = in_array('exception_log', $decoded['tags'], true);
         };
 
@@ -103,7 +105,7 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
         
         $this->app->singleton('Illuminate\Contracts\Debug\ExceptionHandler', 'Illuminate\Foundation\Exceptions\Handler');
             
-        $exception = new \RuntimeException();
+        $exception = new \RuntimeException('Test');
         $this->app['Illuminate\Foundation\Exceptions\Handler']->report($exception);
         
         $this->assertSame($called, 1);
