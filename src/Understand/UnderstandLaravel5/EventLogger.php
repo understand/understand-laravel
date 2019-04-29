@@ -78,6 +78,7 @@ class EventLogger
             'url' => 'UnderstandFieldProvider::getUrl',
             'method' => 'UnderstandFieldProvider::getRequestMethod',
             'client_ip' => 'UnderstandFieldProvider::getClientIp',
+            'server_ip' => 'UnderstandFieldProvider::getServerIp',
         ];
     }
 }
