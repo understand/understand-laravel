@@ -85,21 +85,92 @@ class FieldProviderTest extends Orchestra\Testbench\TestCase
 
     public function testQueryCount()
     {
-        $this->app['understand.dataCollector']->set('sql_queries', range(1, 1000));
+        $this->app['understand.dataCollector']->setLimit(1);
+
+        $this->app['understand.dataCollector']->setInArray('sql_queries', ['query' => 'select', 'bindings' => [1], 'time' => 1]);
+        $this->app['understand.dataCollector']->setInArray('sql_queries', ['query' => 'select', 'bindings' => [1], 'time' => 1]);
 
         $queries = $this->app['understand.fieldProvider']->getSqlQueries();
 
-        $this->assertCount(100, $queries);
+        $this->assertCount(1, $queries);
+    }
+
+    public function testQueryBindings()
+    {
+        $this->app['understand.dataCollector']->setInArray('sql_queries', ['query' => 'SELECT 1 FROM users WHERE id = ?', 'bindings' => [123], 'time' => 1]);
+        $queries = $this->app['understand.fieldProvider']->getSqlQueries();
+
+        $this->assertEquals('SELECT 1 FROM users WHERE id = 123', $queries[0]['query']);
+    }
+
+    public function testDisabledQueryBindings()
+    {
+        $this->app['config']->set('understand-laravel.sql_bindings', false);
+
+        $this->app['understand.dataCollector']->setInArray('sql_queries', ['query' => 'SELECT 1 FROM users WHERE id = ?', 'bindings' => [123], 'time' => 1]);
+        $queries = $this->app['understand.fieldProvider']->getSqlQueries();
+
+        $this->assertEquals('SELECT 1 FROM users WHERE id = ?', $queries[0]['query']);
+        $this->assertTrue(empty($queries[0]['bindings']));
     }
 
     public function testGetServerIp()
     {
-        $this->app['understand.dataCollector']->set('sql_queries', range(1, 1000));
-
         $this->call('GET', '/', [], [], [], ['SERVER_ADDR' => '127.0 0.1']);
 
         $ip = $this->app['understand.fieldProvider']->getServerIp();
 
         $this->assertEquals('127.0 0.1', $ip);
+    }
+
+    public function testQueryString()
+    {
+        $this->call('GET', '/test?query=123&password=1234');
+
+        $queryString = $this->app['understand.fieldProvider']->getQueryStringArray();
+
+        $this->assertEquals('123', $queryString['query']);
+        $this->assertEquals('[value hidden]', $queryString['password']);
+    }
+
+    public function testPostRequestParameters()
+    {
+        $this->call('POST', '/', ['test' => 'a', 'password' => 'b']);
+
+        $postData = $this->app['understand.fieldProvider']->getPostDataArray();
+
+        $this->assertEquals('a', $postData['test']);
+        $this->assertEquals('[value hidden]', $postData['password']);
+    }
+
+    public function testJsonRequest()
+    {
+        $this->json('POST', '/', ['test' => 'b', 'password' => 'test']);
+
+        $jsonData = $this->app['understand.fieldProvider']->getPostDataArray();
+
+        $this->assertEquals('b', $jsonData['test']);
+        $this->assertEquals('[value hidden]', $jsonData['password']);
+    }
+
+    public function testQueryStringDisabled()
+    {
+        $this->app['config']->set('understand-laravel.query_string_enabled', false);
+
+        $this->call('GET', '/test?query=123&password=1234');
+
+        $queryString = $this->app['understand.fieldProvider']->getQueryStringArray();
+
+        $this->assertTrue(empty($queryString));
+    }
+
+    public function testPostRequestParametersDisabled()
+    {
+        $this->app['config']->set('understand-laravel.post_data_enabled', false);
+
+        $this->call('POST', '/', ['test' => 'a', 'password' => 'b']);
+        $postData = $this->app['understand.fieldProvider']->getPostDataArray();
+
+        $this->assertTrue(empty($postData));
     }
 }

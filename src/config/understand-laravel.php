@@ -26,9 +26,24 @@ return [
     'project_root' => base_path() . DIRECTORY_SEPARATOR,
 
     /**
-     * Collect SQL queries without bindings
+     * Collect SQL queries
      */
-    'sql_enabled' => true,
+    'sql_enabled' => env('UNDERSTAND_SQL', true),
+
+    /**
+     * Send SQL values/bindings together with SQL queries
+     */
+    'sql_bindings' => env('UNDERSTAND_SQL_BINDINGS', true),
+
+    /**
+     * Collect a request query string data
+     */
+    'query_string_enabled' => env('UNDERSTAND_QUERY_STRING', true),
+
+    /**
+     * Collect a request form or JSON data
+     */
+    'post_data_enabled' => env('UNDERSTAND_POST_DATA', true),
 
     /**
      * SSL CA Bundle location
@@ -50,4 +65,10 @@ return [
         //'alert',
         //'emergency',
     ],
+
+    /**
+     * Field names which values should not be sent to Understand.io
+     * It applies to POST and GET request parameters
+     */
+    'hidden_fields' => explode(',', env('UNDERSTAND_HIDDEN_REQUEST_FIELDS', 'password,access_token,secret_key,token,access_key')),
 ];

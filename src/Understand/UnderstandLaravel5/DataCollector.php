@@ -11,6 +11,19 @@ class DataCollector
     protected $data = [];
 
     /**
+     * @var int
+     */
+    protected $limit = 50;
+
+    /**
+     * @param $limit
+     */
+    public function setLimit($limit)
+    {
+        $this->limit = $limit;
+    }
+
+    /**
      * @param $key
      * @param $value
      */
@@ -25,6 +38,11 @@ class DataCollector
      */
     public function setInArray($key, $value)
     {
+        if (isset($this->data[$key]) && count($this->data[$key]) > ($this->limit - 1))
+        {
+            array_shift($this->data[$key]);
+        }
+
         $this->data[$key][] = $value;
     }
 
