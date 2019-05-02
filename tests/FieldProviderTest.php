@@ -91,4 +91,15 @@ class FieldProviderTest extends Orchestra\Testbench\TestCase
 
         $this->assertCount(100, $queries);
     }
+
+    public function testGetServerIp()
+    {
+        $this->app['understand.dataCollector']->set('sql_queries', range(1, 1000));
+
+        $this->call('GET', '/', [], [], [], ['SERVER_ADDR' => '127.0 0.1']);
+
+        $ip = $this->app['understand.fieldProvider']->getServerIp();
+
+        $this->assertEquals('127.0 0.1', $ip);
+    }
 }
