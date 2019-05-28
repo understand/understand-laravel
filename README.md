@@ -66,7 +66,7 @@ The following extra information will be collected:
 | HTTP request form or JSON data | Enabled | `UNDERSTAND_POST_DATA=` | `true` or `false` |
 
 Additionally, you can specify which HTTP request field values should not be sent to Understand.io.
-By default the following field values will be hidden: 
+By default, the following field values will be hidden: 
 ```
 UNDERSTAND_HIDDEN_REQUEST_FIELDS=password,access_token,secret_key,token,access_key
 ```
