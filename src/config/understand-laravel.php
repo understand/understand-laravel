@@ -33,7 +33,7 @@ return [
     /**
      * Send SQL values/bindings together with SQL queries
      */
-    'sql_bindings' => env('UNDERSTAND_SQL_BINDINGS', true),
+    'sql_bindings' => env('UNDERSTAND_SQL_BINDINGS', false),
 
     /**
      * Collect a request query string data

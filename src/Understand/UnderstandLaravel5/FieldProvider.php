@@ -296,17 +296,24 @@ class FieldProvider
 
         foreach($queryArray['bindings'] as $key => $value)
         {
-            if ($value instanceof \DateTimeInterface)
+            try
             {
-                $binding = $value->format('Y-m-d H:i:s');
+                if ($value instanceof \DateTimeInterface)
+                {
+                    $binding = $value->format('Y-m-d H:i:s');
+                }
+                elseif (is_bool($value))
+                {
+                    $binding = (int) $value;
+                }
+                else
+                {
+                    $binding = (string)$value;
+                }
             }
-            elseif (is_bool($value))
+            catch (\Exception $e)
             {
-                $binding = (int) $value;
-            }
-            else
-            {
-                $binding = $value;
+                $binding = '[handler error]';
             }
 
             $position = strpos($sqlQuery, $placeholder);

@@ -56,7 +56,22 @@ By default, Laravel automatically stores its [logs](http://laravel.com/docs/erro
 #### PHP/Laravel exceptions
 By default, all errors and exceptions with code fragments and stack traces will be sent to Understand.io. 
 
-In addition, all SQL queries that were executed before each exception or error will also be sent to Understand.io. Note that for security and privacy reasons, we do NOT substitute query parameters. The SQL logging feature can be disabled if you wish -  please see [Advanced configuration](#advanced-configuration).
+The following extra information will be collected:
+
+| Type | By Default | Config Key | Config Options
+| :---: | :---: | :---: | | :---: |
+| SQL queries | Enabled | `UNDERSTAND_SQL=` | `true` or `false` |
+| SQL query values/bindings | Disabled | `UNDERSTAND_SQL_BINDINGS=` | `true` or `false` |
+| HTTP request query string data | Enabled | `UNDERSTAND_QUERY_STRING=` | `true` or `false` |
+| HTTP request form or JSON data | Enabled | `UNDERSTAND_POST_DATA=` | `true` or `false` |
+
+Additionally, you can specify which HTTP request field values should not be sent to Understand.io.
+By default the following field values will be hidden: 
+```
+UNDERSTAND_HIDDEN_REQUEST_FIELDS=password,access_token,secret_key,token,access_key
+```
+
+If you wish you can publish the configuration file and make desired adjustments. See [Advanced configuration](#advanced-configuration)
 
 ### How to send data asynchronously
 
@@ -104,20 +119,6 @@ Laravel's (`>= 5.0, < 5.1`) exception logger doesn't use event dispatcher (https
 ```
 php artisan vendor:publish --provider="Understand\UnderstandLaravel5\UnderstandLaravel5ServiceProvider"
 ```
-
-### Upgrading To Version 2 of the Service Provider
-
-1. Update your `package.json` file, change the version of `understand/understand-laravel5` package and run `composer update understand/understand-laravel5`.
-```json
-"understand/understand-laravel5": "^2.0",
-```
-
-2. Add the following configuration variable to your `.env` file.
-```php
-UNDERSTAND_ENABLED=true
-```
-
-3. If you previously created a `understand-laravel.php` config file in your `config` directory, please delete it and follow [Advanced configuration](#advanced-configuration) steps to publish a new version if necessary.
 
 ### Requirements 
 ##### UTF-8
