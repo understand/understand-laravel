@@ -173,4 +173,34 @@ class FieldProviderTest extends Orchestra\Testbench\TestCase
 
         $this->assertTrue(empty($postData));
     }
+  
+    public function testGroupIdStaysTheSame()
+    {
+        $data = [
+            'file' => 'app/Repositories/StripeWebhookRepository.php',
+            'class' => null,
+            'line' => 27
+        ];
+
+        $hash = $this->app['understand.fieldProvider']->getGroupId($data);
+        $this->assertEquals('1c1cf65bd2685193dca31e321f976512a6f1ea32', $hash);
+
+        $data['code'] = '0';
+
+        $hash = $this->app['understand.fieldProvider']->getGroupId($data);
+        $this->assertEquals('1c1cf65bd2685193dca31e321f976512a6f1ea32', $hash);
+    }
+
+    public function testGroupIdChangesWhenCodeChanges()
+    {
+        $data = [
+            'file' => 'app/Repositories/StripeWebhookRepository.php',
+            'class' => null,
+            'line' => 27,
+            'code' => 12
+        ];
+
+        $hash = $this->app['understand.fieldProvider']->getGroupId($data);
+        $this->assertEquals('b500a4d4a363865e707c3bc95df8d4453e1ad8b1', $hash);
+    }
 }
