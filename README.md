@@ -59,7 +59,7 @@ By default, all errors and exceptions with code fragments and stack traces will 
 The following extra information will be collected:
 
 | Type | By Default | Config Key | Config Options |
-| :---: | :---: | :---: | | :---: |
+| --- | --- | --- | | --- |
 | SQL queries | Enabled | `UNDERSTAND_SQL=` | `true` or `false` |
 | SQL query values/bindings | Disabled | `UNDERSTAND_SQL_BINDINGS=` | `true` or `false` |
 | HTTP request query string data | Enabled | `UNDERSTAND_QUERY_STRING=` | `true` or `false` |
