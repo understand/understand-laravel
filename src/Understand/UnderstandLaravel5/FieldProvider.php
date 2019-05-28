@@ -409,8 +409,19 @@ class FieldProvider
     {
         $parts = [];
 
-        foreach(['class', 'file', 'line'] as $field)
+        foreach(['class', 'file', 'line', 'code'] as $field)
         {
+            // only include `code` if it's not null value
+            // the `code` attribute of the exception object is useful to differentiate SQL and other exceptions
+            //
+            // https://www.php.net/manual/en/exception.getcode.php
+            // https://www.php.net/manual/en/pdo.errorinfo.php
+            // https://docs.oracle.com/cd/E15817_01/appdev.111/b31228/appd.htm
+            if ($field == 'code' && empty($log[$field]))
+            {
+                continue;
+            }
+
             $parts[] = isset($log[$field]) ? (string)$log[$field] : null;
         }
 
