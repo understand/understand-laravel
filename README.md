@@ -56,14 +56,14 @@ By default, all errors and exceptions with code fragments and stack traces will 
 The following extra information will be collected:
 
 | Type | Default | Config Key | Config Options |
-| :---: | :---: | :---: | | :---: |
+| --- | --- | --- | --- |
 | SQL queries | Enabled | `UNDERSTAND_SQL=` | `true` or `false` |
 | SQL query values/bindings | Disabled | `UNDERSTAND_SQL_BINDINGS=` | `true` or `false` |
 | HTTP request query string data | Enabled | `UNDERSTAND_QUERY_STRING=` | `true` or `false` |
 | HTTP request form or JSON data | Enabled | `UNDERSTAND_POST_DATA=` | `true` or `false` |
 
 Additionally, you can specify which HTTP request field values should not be sent to Understand.io.
-By default the following field values will be hidden: 
+By default, the following field values will be hidden: 
 ```
 UNDERSTAND_HIDDEN_REQUEST_FIELDS=password,access_token,secret_key,token,access_key
 ```
