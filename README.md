@@ -5,9 +5,6 @@
 [![Total Downloads](https://poser.pugx.org/understand/understand-laravel5/downloads)](https://packagist.org/packages/understand/understand-laravel5)
 [![License](https://poser.pugx.org/understand/understand-laravel5/license.svg)](https://packagist.org/packages/understand/understand-laravel5)
 
-- [Quick start](#quick-start)  
-- [Upgrading To Version 2](#upgrading-to-version-2-of-the-service-provider)
-
 ### Introduction
 
 This packages provides a full abstraction for Understand.io and provides extra features to improve Laravel's default logging capabilities. It is essentially a wrapper around Laravel's event handler to take full advantage of Understand.io's data aggregation and analysis capabilities.
@@ -58,7 +55,7 @@ By default, all errors and exceptions with code fragments and stack traces will 
 
 The following extra information will be collected:
 
-| Type | By Default | Config Key | Config Options |
+| Type | Default | Config Key | Config Options |
 | :---: | :---: | :---: | | :---: |
 | SQL queries | Enabled | `UNDERSTAND_SQL=` | `true` or `false` |
 | SQL query values/bindings | Disabled | `UNDERSTAND_SQL_BINDINGS=` | `true` or `false` |
