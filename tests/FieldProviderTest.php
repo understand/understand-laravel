@@ -100,17 +100,18 @@ class FieldProviderTest extends Orchestra\Testbench\TestCase
         $this->app['understand.dataCollector']->setInArray('sql_queries', ['query' => 'SELECT 1 FROM users WHERE id = ?', 'bindings' => [123], 'time' => 1]);
         $queries = $this->app['understand.fieldProvider']->getSqlQueries();
 
-        $this->assertEquals('SELECT 1 FROM users WHERE id = 123', $queries[0]['query']);
+        $this->assertEquals('SELECT 1 FROM users WHERE id = ?', $queries[0]['query']);
+        $this->assertTrue(empty($queries[0]['bindings']));
     }
 
-    public function testDisabledQueryBindings()
+    public function testEnableQueryBindings()
     {
-        $this->app['config']->set('understand-laravel.sql_bindings', false);
+        $this->app['config']->set('understand-laravel.sql_bindings', true);
 
         $this->app['understand.dataCollector']->setInArray('sql_queries', ['query' => 'SELECT 1 FROM users WHERE id = ?', 'bindings' => [123], 'time' => 1]);
         $queries = $this->app['understand.fieldProvider']->getSqlQueries();
 
-        $this->assertEquals('SELECT 1 FROM users WHERE id = ?', $queries[0]['query']);
+        $this->assertEquals('SELECT 1 FROM users WHERE id = 123', $queries[0]['query']);
         $this->assertTrue(empty($queries[0]['bindings']));
     }
 
