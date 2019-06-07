@@ -135,7 +135,7 @@ class ExceptionLogger
             'url' => 'UnderstandFieldProvider::getUrl',
             'method' => 'UnderstandFieldProvider::getRequestMethod',
             'query_string_data' => 'UnderstandFieldProvider::getQueryStringArray',
-            'post_data' => 'UnderstandFieldProvider::getPostDataArray',
+            'request_body_data' => 'UnderstandFieldProvider::getPostDataArray',
             'client_ip' => 'UnderstandFieldProvider::getClientIp',
             'server_ip' => 'UnderstandFieldProvider::getServerIp',
             'user_agent' => 'UnderstandFieldProvider::getClientUserAgent',
