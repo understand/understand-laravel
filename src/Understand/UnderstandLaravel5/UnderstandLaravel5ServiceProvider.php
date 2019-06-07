@@ -265,6 +265,7 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
             {
                 $this->app['understand.dataCollector']->setInArray('sql_queries', [
                     'query' => $query,
+                    'bindings' => $bindings,
                     'time' => $time,
                 ]);
             });
@@ -276,6 +277,7 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
             {
                 $this->app['understand.dataCollector']->setInArray('sql_queries', [
                     'query' => $event->sql,
+                    'bindings' => $event->bindings,
                     'time' => $event->time,
                 ]);
             });

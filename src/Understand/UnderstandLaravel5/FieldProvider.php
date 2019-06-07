@@ -39,6 +39,8 @@ class FieldProvider
         'getArtisanCommandName',
         'getRunningInConsole',
         'getLoggerVersion',
+        'getPostDataArray',
+        'getQueryStringArray',
     ];
 
     /**
@@ -261,13 +263,69 @@ class FieldProvider
             return [];
         }
 
-        if ($queries = $this->dataCollector->getByKey('sql_queries'))
+        $queries = $this->dataCollector->getByKey('sql_queries');
+
+        if ( ! $queries)
         {
-            return array_slice($queries, -100);
+            return null;
         }
 
-        return [];
+        $bindingsEnabled = $this->app['config']->get('understand-laravel.sql_bindings');
+
+        foreach($queries as $key => $queryArray)
+        {
+            if ($bindingsEnabled)
+            {
+                $queries[$key]['query'] = $this->mergeBindings($queryArray);
+            }
+
+            unset($queries[$key]['bindings']);
+        }
+
+        return $queries;
     }
+
+    /**
+     * @param $queryArray
+     * @return mixed
+     */
+    protected function mergeBindings($queryArray)
+    {
+        $sqlQuery = $queryArray['query'];
+        $placeholder = '?';
+
+        foreach($queryArray['bindings'] as $key => $value)
+        {
+            try
+            {
+                if ($value instanceof \DateTimeInterface)
+                {
+                    $binding = $value->format('Y-m-d H:i:s');
+                }
+                elseif (is_bool($value))
+                {
+                    $binding = (int) $value;
+                }
+                else
+                {
+                    $binding = (string)$value;
+                }
+            }
+            catch (\Exception $e)
+            {
+                $binding = '[handler error]';
+            }
+
+            $position = strpos($sqlQuery, $placeholder);
+
+            if ($position !== false)
+            {
+                $sqlQuery = substr_replace($sqlQuery, $binding, $position, strlen($placeholder));
+            }
+        }
+
+        return $sqlQuery;
+}
 
     /**
      * Return current route name
@@ -303,14 +361,107 @@ class FieldProvider
             $url = '/' . $url;
         }
 
-        $queryString = $this->request->getQueryString();
+        return $url;
+    }
 
-        if ($queryString)
+    /**
+     * @return array|null
+     */
+    protected function getQueryStringArray()
+    {
+        $enabled = $this->app['config']->get('understand-laravel.query_string_enabled');
+
+        if ( ! $enabled)
         {
-            $url .= '?' . $queryString;
+            return null;
         }
 
-        return $url;
+        if ( ! $this->request->query instanceof \IteratorAggregate)
+        {
+            return null;
+        }
+
+        $queryString = [];
+
+        foreach($this->request->query as $key => $value)
+        {
+            try
+            {
+                $queryString[$key] = $this->parseRequestFieldValue($key, $value);
+            }
+            catch (\Exception $e)
+            {
+                $queryString[$key] = '[handler error]';
+            }
+        }
+
+        return $queryString;
+    }
+
+    /**
+     * @return array|null
+     */
+    protected function getPostDataArray()
+    {
+        $enabled = $this->app['config']->get('understand-laravel.post_data_enabled');
+
+        if ( ! $enabled)
+        {
+            return null;
+        }
+
+        if ( ! $this->request->request instanceof \IteratorAggregate)
+        {
+            return null;
+        }
+
+        $postData = [];
+
+        foreach($this->request->request as $key => $value)
+        {
+            try
+            {
+                $postData[$key] = $this->parseRequestFieldValue($key, $value);
+            }
+            catch (\Exception $e)
+            {
+                $postData[$key] = '[handler error]';
+            }
+        }
+
+        return $postData;
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     * @return mixed|string
+     */
+    protected function parseRequestFieldValue($key, $value)
+    {
+        $hiddenFields = $this->app['config']->get('understand-laravel.hidden_fields', []);
+
+        if (in_array($key, $hiddenFields))
+        {
+            return '[value hidden]';
+        }
+
+        if (is_scalar($value))
+        {
+            return $value;
+        }
+
+        if (is_array($value))
+        {
+            return print_r($value, true);
+        }
+
+        if (is_object($value))
+        {
+            return get_class($value);
+        }
+
+        return (string)$value;
     }
 
     /**
