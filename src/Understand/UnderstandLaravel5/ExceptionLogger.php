@@ -134,6 +134,8 @@ class ExceptionLogger
             'env' => 'UnderstandFieldProvider::getEnvironment',
             'url' => 'UnderstandFieldProvider::getUrl',
             'method' => 'UnderstandFieldProvider::getRequestMethod',
+            'query_string_data' => 'UnderstandFieldProvider::getQueryStringArray',
+            'request_body_data' => 'UnderstandFieldProvider::getPostDataArray',
             'client_ip' => 'UnderstandFieldProvider::getClientIp',
             'server_ip' => 'UnderstandFieldProvider::getServerIp',
             'user_agent' => 'UnderstandFieldProvider::getClientUserAgent',
