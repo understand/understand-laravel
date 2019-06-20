@@ -410,6 +410,13 @@ class FieldProvider
             return null;
         }
 
+        // Laravel merge and update the symphony `request` property that should hold only POST data
+        // by checking if the request method is not GET or HEAD we can decide whether to use it or not
+        if (in_array($this->request->getRealMethod(), ['GET', 'HEAD']))
+        {
+            return null;
+        }
+
         if ( ! $this->request->request instanceof \IteratorAggregate)
         {
             return null;
