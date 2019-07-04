@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Queue\Events\JobProcessing;
 use Understand\UnderstandLaravel5\Logger;
 use Understand\UnderstandLaravel5\Handlers\CallbackHandler;
 
@@ -47,6 +48,29 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
 
         $this->assertSame($called, 1);
         $this->assertTrue($messageSame);
+    }
+
+    /**
+     * Test event listener
+     *
+     * @return void
+     */
+    public function testRegenerateToken()
+    {
+        $payload = 'test';
+        $connectionName = 'sync';
+        $queue = 'sync';
+
+        $initialToken = $this->app['understand.tokenProvider']->getToken();
+
+        $this->assertEquals($initialToken, $this->app['understand.tokenProvider']->getToken());
+
+        $job = new \Illuminate\Queue\Jobs\SyncJob($this->app, $payload, $connectionName, $queue);
+
+        $this->app['events']->dispatch(new JobProcessing($connectionName, $job));
+
+        $this->assertNotEmpty($initialToken);
+        $this->assertNotEquals($initialToken, $this->app['understand.tokenProvider']->getToken());
     }
 
     /**
