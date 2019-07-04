@@ -258,11 +258,13 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
                 $this->app['events']->listen('illuminate.queue.after', function()
                 {
                     $this->app['understand.tokenProvider']->generate();
+                    $this->app['understand.dataCollector']->reset();
                 });
 
                 $this->app['events']->listen('illuminate.queue.failed', function()
                 {
                     $this->app['understand.tokenProvider']->generate();
+                    $this->app['understand.dataCollector']->reset();
                 });
             }
             else
@@ -270,6 +272,7 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
                 $this->app['events']->listen('Illuminate\Queue\Events\JobProcessing', function()
                 {
                     $this->app['understand.tokenProvider']->generate();
+                    $this->app['understand.dataCollector']->reset();
                 });
             }
         }
