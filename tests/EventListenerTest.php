@@ -73,22 +73,25 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
      */
     public function testRegenerateToken()
     {
-        $payload = 'test';
-        $connectionName = 'sync';
-        $queue = 'sync';
-
         $initialToken = $this->app['understand.tokenProvider']->getToken();
 
         $this->assertEquals($initialToken, $this->app['understand.tokenProvider']->getToken());
 
+        $event = 'illuminate.queue.after';
+
         if (class_exists('Illuminate\Queue\Events\JobProcessing'))
         {
-            $job = new \Illuminate\Queue\Jobs\SyncJob($this->app, $payload, $connectionName, $queue);
-            $this->app['events']->dispatch(new JobProcessing($connectionName, $job));
+            $job = new \Illuminate\Queue\Jobs\SyncJob($this->app, 'test', 'sync', 'sync');
+            $event = new JobProcessing('sync', $job);
+        }
+
+        if (method_exists($this->app['events'], 'dispatch'))
+        {
+            $this->app['events']->dispatch($event);
         }
         else
         {
-            $this->app['events']->fire('illuminate.queue.after');
+            $this->app['events']->fire($event);
         }
 
         $this->assertNotEmpty($initialToken);
@@ -102,22 +105,23 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
      */
     public function testDataCollectorResetsToken()
     {
-        $payload = 'test';
-        $connectionName = 'sync';
-        $queue = 'sync';
-
         $this->app['understand.dataCollector']->setInArray('test', 1);
 
         $this->assertEquals([1], $this->app['understand.dataCollector']->getByKey('test'));
 
         if (class_exists('Illuminate\Queue\Events\JobProcessing'))
         {
-            $job = new \Illuminate\Queue\Jobs\SyncJob($this->app, $payload, $connectionName, $queue);
-            $this->app['events']->dispatch(new JobProcessing($connectionName, $job));
+            $job = new \Illuminate\Queue\Jobs\SyncJob($this->app, 'test', 'sync', 'sync');
+            $event = new JobProcessing('sync', $job);
+        }
+
+        if (method_exists($this->app['events'], 'dispatch'))
+        {
+            $this->app['events']->dispatch($event);
         }
         else
         {
-            $this->app['events']->fire('illuminate.queue.after');
+            $this->app['events']->fire($event);
         }
 
         $this->assertEmpty($this->app['understand.dataCollector']->getByKey('test'));
