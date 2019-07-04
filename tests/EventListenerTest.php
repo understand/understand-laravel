@@ -21,20 +21,6 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
     }
 
     /**
-     * @return void
-     */
-    protected function refreshApplication()
-    {
-        parent::refreshApplication();
-
-        // https://github.com/understand/understand-laravel5#how-to-report-laravel-50--50--51-exceptions
-        if (Str::startsWith(Application::VERSION, ['5.0', '5.1']))
-        {
-            $this->markTestSkipped('Laravel\'s (>= 5.0, < 5.1) exception logger doesn\'t use event dispatcher.');
-        }
-    }
-
-    /**
      * Test event listener
      *
      * @return void
@@ -108,6 +94,8 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
         $this->app['understand.dataCollector']->setInArray('test', 1);
 
         $this->assertEquals([1], $this->app['understand.dataCollector']->getByKey('test'));
+
+        $event = 'illuminate.queue.after';
 
         if (class_exists('Illuminate\Queue\Events\JobProcessing'))
         {

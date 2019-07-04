@@ -34,39 +34,39 @@ class FieldProviderTest extends Orchestra\Testbench\TestCase
     public function testLaravelAuth()
     {
         $userId = 23452345;
-        
+
         \Illuminate\Support\Facades\Auth::shouldReceive('id')->once()->andReturn($userId);
-        
+
         $currentUserId = $this->app['understand.fieldProvider']->getUserId();
-        
+
         $this->assertSame($userId, $currentUserId);
     }
-    
+
     public function testSentinelGetUser()
     {
         $loader = AliasLoader::getInstance();
         $loader->alias('Sentinel', '\Illuminate\Support\Facades\Auth');
-        
+
         $user = new stdClass();
         $user->id = 423523;
-        
+
         \Illuminate\Support\Facades\Auth::shouldReceive('getUser')->once()->andReturn($user);
-        
+
         $currentUserId = $this->app['understand.fieldProvider']->getUserId();
 
         $this->assertSame($user->id, $currentUserId);
     }
-        
+
     public function testSentryGetUser()
     {
         $loader = AliasLoader::getInstance();
         $loader->alias('Sentry', '\Illuminate\Support\Facades\Auth');
-        
+
         $user = new stdClass();
         $user->id = 545;
-        
+
         \Illuminate\Support\Facades\Auth::shouldReceive('getUser')->once()->andReturn($user);
-        
+
         $currentUserId = $this->app['understand.fieldProvider']->getUserId();
 
         $this->assertSame($user->id, $currentUserId);
