@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Foundation\Application;
 use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Support\Str;
 use Understand\UnderstandLaravel5\Logger;
 use Understand\UnderstandLaravel5\Handlers\CallbackHandler;
 
@@ -17,7 +19,21 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
     {
         return ['Understand\UnderstandLaravel5\UnderstandLaravel5ServiceProvider'];
     }
-    
+
+    /**
+     * @return void
+     */
+    public function setUp()
+    {
+        parent::setUp();
+
+        // https://github.com/understand/understand-laravel5#how-to-report-laravel-50--50--51-exceptions
+        if (Str::startsWith(Application::VERSION, ['5.0', '5.1']))
+        {
+            $this->markTestSkipped('Laravel\'s (>= 5.0, < 5.1) exception logger doesn\'t use event dispatcher.');
+        }
+    }
+
     /**
      * Test event listener
      *
@@ -65,9 +81,15 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
 
         $this->assertEquals($initialToken, $this->app['understand.tokenProvider']->getToken());
 
-        $job = new \Illuminate\Queue\Jobs\SyncJob($this->app, $payload, $connectionName, $queue);
-
-        $this->app['events']->dispatch(new JobProcessing($connectionName, $job));
+        if (class_exists('Illuminate\Queue\Events\JobProcessing'))
+        {
+            $job = new \Illuminate\Queue\Jobs\SyncJob($this->app, $payload, $connectionName, $queue);
+            $this->app['events']->dispatch(new JobProcessing($connectionName, $job));
+        }
+        else
+        {
+            $this->app['events']->fire('illuminate.queue.after');
+        }
 
         $this->assertNotEmpty($initialToken);
         $this->assertNotEquals($initialToken, $this->app['understand.tokenProvider']->getToken());
@@ -88,8 +110,15 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
 
         $this->assertEquals([1], $this->app['understand.dataCollector']->getByKey('test'));
 
-        $job = new \Illuminate\Queue\Jobs\SyncJob($this->app, $payload, $connectionName, $queue);
-        $this->app['events']->dispatch(new JobProcessing($connectionName, $job));
+        if (class_exists('Illuminate\Queue\Events\JobProcessing'))
+        {
+            $job = new \Illuminate\Queue\Jobs\SyncJob($this->app, $payload, $connectionName, $queue);
+            $this->app['events']->dispatch(new JobProcessing($connectionName, $job));
+        }
+        else
+        {
+            $this->app['events']->fire('illuminate.queue.after');
+        }
 
         $this->assertEmpty($this->app['understand.dataCollector']->getByKey('test'));
     }
@@ -259,7 +288,7 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
         $this->assertSame($called, 1);
         $this->assertTrue($messageSame);
     }
-    
+
     /**
      * @return void
      */
