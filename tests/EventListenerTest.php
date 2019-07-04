@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Foundation\Application;
 use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Support\Str;
 use Understand\UnderstandLaravel5\Logger;
 use Understand\UnderstandLaravel5\Handlers\CallbackHandler;
 
@@ -17,7 +19,7 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
     {
         return ['Understand\UnderstandLaravel5\UnderstandLaravel5ServiceProvider'];
     }
-    
+
     /**
      * Test event listener
      *
@@ -57,17 +59,26 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
      */
     public function testRegenerateToken()
     {
-        $payload = 'test';
-        $connectionName = 'sync';
-        $queue = 'sync';
-
         $initialToken = $this->app['understand.tokenProvider']->getToken();
 
         $this->assertEquals($initialToken, $this->app['understand.tokenProvider']->getToken());
 
-        $job = new \Illuminate\Queue\Jobs\SyncJob($this->app, $payload, $connectionName, $queue);
+        $event = 'illuminate.queue.after';
 
-        $this->app['events']->dispatch(new JobProcessing($connectionName, $job));
+        if (class_exists('Illuminate\Queue\Events\JobProcessing'))
+        {
+            $job = new \Illuminate\Queue\Jobs\SyncJob($this->app, 'test', 'sync', 'sync');
+            $event = new JobProcessing('sync', $job, ['only 5.2 requires the third parameter']);
+        }
+
+        if (method_exists($this->app['events'], 'dispatch'))
+        {
+            $this->app['events']->dispatch($event);
+        }
+        else
+        {
+            $this->app['events']->fire($event);
+        }
 
         $this->assertNotEmpty($initialToken);
         $this->assertNotEquals($initialToken, $this->app['understand.tokenProvider']->getToken());
@@ -80,16 +91,26 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
      */
     public function testDataCollectorResetsToken()
     {
-        $payload = 'test';
-        $connectionName = 'sync';
-        $queue = 'sync';
-
         $this->app['understand.dataCollector']->setInArray('test', 1);
 
         $this->assertEquals([1], $this->app['understand.dataCollector']->getByKey('test'));
 
-        $job = new \Illuminate\Queue\Jobs\SyncJob($this->app, $payload, $connectionName, $queue);
-        $this->app['events']->dispatch(new JobProcessing($connectionName, $job));
+        $event = 'illuminate.queue.after';
+
+        if (class_exists('Illuminate\Queue\Events\JobProcessing'))
+        {
+            $job = new \Illuminate\Queue\Jobs\SyncJob($this->app, 'test', 'sync', 'sync');
+            $event = new JobProcessing('sync', $job, ['only 5.2 requires the third parameter']);
+        }
+
+        if (method_exists($this->app['events'], 'dispatch'))
+        {
+            $this->app['events']->dispatch($event);
+        }
+        else
+        {
+            $this->app['events']->fire($event);
+        }
 
         $this->assertEmpty($this->app['understand.dataCollector']->getByKey('test'));
     }
@@ -259,7 +280,7 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
         $this->assertSame($called, 1);
         $this->assertTrue($messageSame);
     }
-    
+
     /**
      * @return void
      */

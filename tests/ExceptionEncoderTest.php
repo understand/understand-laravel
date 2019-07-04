@@ -1,6 +1,6 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
+use Orchestra\Testbench\TestCase;
 
 class ExceptionEncoderTest extends TestCase
 {

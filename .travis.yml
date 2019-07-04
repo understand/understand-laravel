@@ -1,13 +1,49 @@
 language: php
 
+cache:
+  directories:
+    - $HOME/.cache/pip
+    - $HOME/.composer/cache/files
+
 php:
   - 7.0
   - 7.1
   - 7.2
   - 7.3
 
-before_script:
+env:
+  - ILLUMINATE_VERSION=5.1.* PHPUNIT_VERSION=~4.0
+  - ILLUMINATE_VERSION=5.2.* PHPUNIT_VERSION=~4.0
+  - ILLUMINATE_VERSION=5.3.* PHPUNIT_VERSION=~5.0
+  - ILLUMINATE_VERSION=5.4.* PHPUNIT_VERSION=~5.7
+  - ILLUMINATE_VERSION=5.5.* PHPUNIT_VERSION=~6.0
+  - ILLUMINATE_VERSION=5.6.* PHPUNIT_VERSION=~7.0
+  - ILLUMINATE_VERSION=5.7.* PHPUNIT_VERSION=~7.0
+  - ILLUMINATE_VERSION=5.8.* PHPUNIT_VERSION=^7.5
+
+matrix:
+  exclude:
+    # 5.5 & 7.0
+    - php: 7.0
+      env: ILLUMINATE_VERSION=5.6.* PHPUNIT_VERSION=~7.0
+    - php: 7.0
+      env: ILLUMINATE_VERSION=5.7.* PHPUNIT_VERSION=~7.0
+    - php: 7.0
+      env: ILLUMINATE_VERSION=5.8.* PHPUNIT_VERSION=^7.5
+    # 5.4 & 7.1
+    - php: 7.1
+      env: ILLUMINATE_VERSION=5.1.* PHPUNIT_VERSION=~4.0
+    - php: 7.1
+      env: ILLUMINATE_VERSION=5.2.* PHPUNIT_VERSION=~4.0
+    - php: 7.1
+      env: ILLUMINATE_VERSION=5.3.* PHPUNIT_VERSION=~5.0
+
+before_install:
   - travis_retry composer self-update
-  - travis_retry composer install --prefer-source --no-interaction --dev
+  - composer require "illuminate/support:${ILLUMINATE_VERSION}" --no-update --prefer-dist
+  - composer require "orchestra/testbench:${ILLUMINATE_VERSION/5\./3\.}" --no-update --prefer-dist
+  - composer require "phpunit/phpunit:${PHPUNIT_VERSION}" --no-update --prefer-dist
+
+install: travis_retry composer install --no-interaction --prefer-dist
 
 script: vendor/bin/phpunit
