@@ -100,7 +100,7 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
         if (class_exists('Illuminate\Queue\Events\JobProcessing'))
         {
             $job = new \Illuminate\Queue\Jobs\SyncJob($this->app, 'test', 'sync', 'sync');
-            $event = new JobProcessing('sync', $job);
+            $event = new JobProcessing('sync', $job, ['only 5.2 requires the third parameter']);
         }
 
         if (method_exists($this->app['events'], 'dispatch'))
