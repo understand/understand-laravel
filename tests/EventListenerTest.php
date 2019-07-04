@@ -23,7 +23,7 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
     /**
      * @return void
      */
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
