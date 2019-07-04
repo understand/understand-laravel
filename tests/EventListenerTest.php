@@ -78,6 +78,27 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
      *
      * @return void
      */
+    public function testDataCollectorResetsToken()
+    {
+        $payload = 'test';
+        $connectionName = 'sync';
+        $queue = 'sync';
+
+        $this->app['understand.dataCollector']->setInArray('test', 1);
+
+        $this->assertEquals([1], $this->app['understand.dataCollector']->getByKey('test'));
+
+        $job = new \Illuminate\Queue\Jobs\SyncJob($this->app, $payload, $connectionName, $queue);
+        $this->app['events']->dispatch(new JobProcessing($connectionName, $job));
+
+        $this->assertEmpty($this->app['understand.dataCollector']->getByKey('test'));
+    }
+
+    /**
+     * Test event listener
+     *
+     * @return void
+     */
     public function testIgnoredLogsConfig()
     {
         $called = 0;
