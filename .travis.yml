@@ -38,7 +38,7 @@ matrix:
     - php: 7.1
       env: ILLUMINATE_VERSION=5.3.* PHPUNIT_VERSION=~5.0
 
-before_script:
+before_install:
   - travis_retry composer self-update
   - composer global require hirak/prestissimo --update-no-dev
   - composer require "illuminate/support:${ILLUMINATE_VERSION}" --no-update --prefer-dist
