@@ -23,9 +23,9 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
     /**
      * @return void
      */
-    protected function setUp()
+    protected function refreshApplication()
     {
-        parent::setUp();
+        parent::refreshApplication();
 
         // https://github.com/understand/understand-laravel5#how-to-report-laravel-50--50--51-exceptions
         if (Str::startsWith(Application::VERSION, ['5.0', '5.1']))
