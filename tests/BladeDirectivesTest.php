@@ -38,7 +38,7 @@ class BladeDirectivesTest extends TestCase
         $this->assertStringStartsWith('Understand.init(', $result[2]);
         $this->assertStringEndsWith(');', $result[2]);
 
-        $configuration = str_replace_first('Understand.init(', '', str_replace_last(');', '', $result[2]));
+        $configuration = str_replace('Understand.init(', '', str_replace(');', '', $result[2]));
 
         $this->assertEquals(UnderstandJsProvider::getJsConfig(), json_decode($configuration, true));
 
