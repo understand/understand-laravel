@@ -1,7 +1,7 @@
 <?php
 
 use Understand\UnderstandLaravel5\ExceptionEncoder;
-use PHPUnit\Framework\TestCase;
+use Orchestra\Testbench\TestCase;
 
 class TestFileReaderTest extends TestCase
 {

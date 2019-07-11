@@ -1,9 +1,8 @@
 ## Laravel 5 service provider for Understand.io
 
-[![Build Status](https://api.travis-ci.org/understand/understand-laravel5.svg?branch=master)](https://api.travis-ci.org/understand/understand-laravel5.svg?branch=master)
-[![Latest Stable Version](https://poser.pugx.org/understand/understand-laravel5/v/stable.svg)](https://packagist.org/packages/understand/understand-laravel5) 
-[![Total Downloads](https://poser.pugx.org/understand/understand-laravel5/downloads)](https://packagist.org/packages/understand/understand-laravel5)
-[![License](https://poser.pugx.org/understand/understand-laravel5/license.svg)](https://packagist.org/packages/understand/understand-laravel5)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/understand/understand-laravel5.svg?style=flat-square)](https://packagist.org/packages/understand/understand-laravel5)
+[![Quality Score](https://img.shields.io/scrutinizer/g/understand/understand-laravel5.svg?style=flat-square)](https://scrutinizer-ci.com/g/understand/understand-laravel5)
+[![Total Downloads](https://img.shields.io/packagist/dt/understand/understand-laravel5.svg?style=flat-square)](https://packagist.org/packages/understand/understand-laravel5)
 
 ### Introduction
 

@@ -24,6 +24,14 @@ class DataCollector
     }
 
     /**
+     * @return void
+     */
+    public function reset()
+    {
+        $this->data = [];
+    }
+
+    /**
      * @param $key
      * @param $value
      */

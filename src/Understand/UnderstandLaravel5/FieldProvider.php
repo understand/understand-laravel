@@ -417,14 +417,29 @@ class FieldProvider
             return null;
         }
 
-        if ( ! $this->request->request instanceof \IteratorAggregate)
+        $source = null;
+
+        if (method_exists($this->request, 'json') && method_exists($this->request, 'isJson') && $this->request->isJson())
         {
-            return null;
+            $source = $this->request->json();
+        }
+        else if ($this->request->request instanceof \IteratorAggregate)
+        {
+            $source = $this->request->request;
+        }
+        else
+        {
+            return;
+        }
+
+        if ( ! $source)
+        {
+            return;
         }
 
         $postData = [];
 
-        foreach($this->request->request as $key => $value)
+        foreach($source as $key => $value)
         {
             try
             {

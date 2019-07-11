@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\AliasLoader;
+use Illuminate\Support\Str;
 
 class FieldProviderTest extends Orchestra\Testbench\TestCase
 {
@@ -33,39 +34,39 @@ class FieldProviderTest extends Orchestra\Testbench\TestCase
     public function testLaravelAuth()
     {
         $userId = 23452345;
-        
+
         \Illuminate\Support\Facades\Auth::shouldReceive('id')->once()->andReturn($userId);
-        
+
         $currentUserId = $this->app['understand.fieldProvider']->getUserId();
-        
+
         $this->assertSame($userId, $currentUserId);
     }
-    
+
     public function testSentinelGetUser()
     {
         $loader = AliasLoader::getInstance();
         $loader->alias('Sentinel', '\Illuminate\Support\Facades\Auth');
-        
+
         $user = new stdClass();
         $user->id = 423523;
-        
+
         \Illuminate\Support\Facades\Auth::shouldReceive('getUser')->once()->andReturn($user);
-        
+
         $currentUserId = $this->app['understand.fieldProvider']->getUserId();
 
         $this->assertSame($user->id, $currentUserId);
     }
-        
+
     public function testSentryGetUser()
     {
         $loader = AliasLoader::getInstance();
         $loader->alias('Sentry', '\Illuminate\Support\Facades\Auth');
-        
+
         $user = new stdClass();
         $user->id = 545;
-        
+
         \Illuminate\Support\Facades\Auth::shouldReceive('getUser')->once()->andReturn($user);
-        
+
         $currentUserId = $this->app['understand.fieldProvider']->getUserId();
 
         $this->assertSame($user->id, $currentUserId);
@@ -117,6 +118,8 @@ class FieldProviderTest extends Orchestra\Testbench\TestCase
 
     public function testGetServerIp()
     {
+        \Illuminate\Support\Facades\Route::get('/', function() {});
+
         $this->call('GET', '/', [], [], [], ['SERVER_ADDR' => '127.0 0.1']);
 
         $ip = $this->app['understand.fieldProvider']->getServerIp();
@@ -126,6 +129,8 @@ class FieldProviderTest extends Orchestra\Testbench\TestCase
 
     public function testQueryString()
     {
+        \Illuminate\Support\Facades\Route::get('/test', function() {});
+
         $this->call('GET', '/test?query=123&password=1234');
 
         $queryString = $this->app['understand.fieldProvider']->getQueryStringArray();
@@ -136,6 +141,8 @@ class FieldProviderTest extends Orchestra\Testbench\TestCase
 
     public function testPostRequestParameters()
     {
+        \Illuminate\Support\Facades\Route::post('/', function() {});
+
         $this->call('POST', '/', ['test' => 'a', 'password' => 'b']);
 
         $postData = $this->app['understand.fieldProvider']->getPostDataArray();
@@ -146,6 +153,13 @@ class FieldProviderTest extends Orchestra\Testbench\TestCase
 
     public function testJsonRequest()
     {
+        if ( ! method_exists($this, 'json'))
+        {
+            return $this->markTestSkipped('The test base class does not support json requests');
+        }
+
+        \Illuminate\Support\Facades\Route::post('/', function() {});
+
         $this->json('POST', '/', ['test' => 'b', 'password' => 'test']);
 
         $jsonData = $this->app['understand.fieldProvider']->getPostDataArray();
@@ -156,6 +170,8 @@ class FieldProviderTest extends Orchestra\Testbench\TestCase
 
     public function testQueryStringDisabled()
     {
+        \Illuminate\Support\Facades\Route::get('/test', function() {});
+
         $this->app['config']->set('understand-laravel.query_string_enabled', false);
 
         $this->call('GET', '/test?query=123&password=1234');
@@ -167,6 +183,8 @@ class FieldProviderTest extends Orchestra\Testbench\TestCase
 
     public function testPostRequestParametersDisabled()
     {
+        \Illuminate\Support\Facades\Route::post('/', function() {});
+
         $this->app['config']->set('understand-laravel.post_data_enabled', false);
 
         $this->call('POST', '/', ['test' => 'a', 'password' => 'b']);

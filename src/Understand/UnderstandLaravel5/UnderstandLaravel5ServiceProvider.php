@@ -224,7 +224,7 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
     }
     
     /**
-     * Listen Laravel logs
+     * Listen Laravel logs and queue events
      *
      * @return void
      */
@@ -247,6 +247,34 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
 
                 $this->handleEvent($log->level, $log->message, $log->context);
             });
+        }
+
+        // starting from L5.2 JobProcessing event class was introduced
+        // https://github.com/illuminate/queue/commit/ce2b5518902b1bcb9ef650c41900fc8c6392eb0c
+        if ($this->app->runningInConsole())
+        {
+            if ($this->detectLaravelVersion(['5.0', '5.1']))
+            {
+                $this->app['events']->listen('illuminate.queue.after', function()
+                {
+                    $this->app['understand.tokenProvider']->generate();
+                    $this->app['understand.dataCollector']->reset();
+                });
+
+                $this->app['events']->listen('illuminate.queue.failed', function()
+                {
+                    $this->app['understand.tokenProvider']->generate();
+                    $this->app['understand.dataCollector']->reset();
+                });
+            }
+            else
+            {
+                $this->app['events']->listen('Illuminate\Queue\Events\JobProcessing', function()
+                {
+                    $this->app['understand.tokenProvider']->generate();
+                    $this->app['understand.dataCollector']->reset();
+                });
+            }
         }
     }
 
