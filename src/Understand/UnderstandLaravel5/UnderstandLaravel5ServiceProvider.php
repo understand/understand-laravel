@@ -50,20 +50,22 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
      */
 	protected function registerBladeDirectives()
     {
-        $configuration = UnderstandJsProvider::getJsConfig();
-
         // L5.0 does not support custom directives
         if ($this->detectLaravelVersion(['5.0']))
         {
-            Blade::extend(function ($view, $compiler) use ($configuration)
+            Blade::extend(function ($view, $compiler)
             {
+                $configuration = UnderstandJsProvider::getJsConfig();
+
                 $pattern = $compiler->createMatcher('understandJsConfig');
 
                 return preg_replace($pattern, json_encode($configuration), $view);
             });
 
-            Blade::extend(function ($view, $compiler) use ($configuration)
+            Blade::extend(function ($view, $compiler)
             {
+                $configuration = UnderstandJsProvider::getJsConfig();
+
                 $pattern = $compiler->createMatcher('understandJs');
 
                 $out  = "<script src=\"" . UnderstandJsProvider::getJsBundleUrl() . "\"></script>\r\n";
@@ -77,13 +79,17 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
         }
         else
         {
-            Blade::directive('understandJsConfig', function () use ($configuration)
+            Blade::directive('understandJsConfig', function ()
             {
+                $configuration = UnderstandJsProvider::getJsConfig();
+
                 return json_encode($configuration);
             });
 
-            Blade::directive('understandJs', function () use ($configuration)
+            Blade::directive('understandJs', function ()
             {
+                $configuration = UnderstandJsProvider::getJsConfig();
+
                 $out  = "<script src=\"" . UnderstandJsProvider::getJsBundleUrl() . "\"></script>\r\n";
                 $out .= "<script>\r\n";
                 $out .= "Understand.init(" . json_encode($configuration) . ");\r\n";
