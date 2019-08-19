@@ -15,12 +15,12 @@ class FieldProviderTest extends Orchestra\Testbench\TestCase
     {
         return ['Understand\UnderstandLaravel5\UnderstandLaravel5ServiceProvider'];
     }
-    
+
     public function testExtend()
     {
         $fieldProvider = new \Understand\UnderstandLaravel5\FieldProvider();
         $method = 'getTestValue';
-        $value = 'tets value';
+        $value = 'test value';
         $this->assertFalse(method_exists($fieldProvider, $method));
 
         $fieldProvider->extend($method, function() use($value)
@@ -29,6 +29,26 @@ class FieldProviderTest extends Orchestra\Testbench\TestCase
         });
 
         $this->assertSame($value, $fieldProvider->{$method}());
+    }
+
+    public function testCustomData()
+    {
+        $fieldProvider = new \Understand\UnderstandLaravel5\FieldProvider();
+
+        $method = 'getTestValue';
+        $value = 'test value';
+        $fieldProvider->extend($method, function() use ($value)
+        {
+            return $value;
+        });
+
+        $data = $fieldProvider->resolveValues([
+            '\Understand\UnderstandLaravel5\FieldProvider::getTestValue'
+        ], [
+            'message' => 'test message'
+        ]);
+
+        $this->assertSame([$value], $data);
     }
 
     public function testLaravelAuth()
