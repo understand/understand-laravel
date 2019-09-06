@@ -45,6 +45,10 @@ matrix:
 before_install:
   - travis_retry composer self-update
   - composer require "illuminate/support:${ILLUMINATE_VERSION}" --no-update --prefer-dist
+  - if [ ${ILLUMINATE_VERSION} == "6.0.*" ];
+    then composer require "orchestra/testbench:${ILLUMINATE_VERSION/6\./4\.}" --no-update --prefer-dist;
+    else composer require "orchestra/testbench:${ILLUMINATE_VERSION/5\./3\.}" --no-update --prefer-dist;
+    fi
   - composer require "orchestra/testbench:${ILLUMINATE_VERSION/5\./3\.}" --no-update --prefer-dist
   - composer require "phpunit/phpunit:${PHPUNIT_VERSION}" --no-update --prefer-dist
 
