@@ -5,6 +5,12 @@ use Understand\UnderstandLaravel5\Facades\UnderstandFieldProvider;
 
 class JsProvider
 {
+
+    /**
+     * JS bundle version
+     */
+    const DEFAULT_BUNDLE_VERSION = 'v1';
+
     /**
      * @var Application
      */
@@ -25,7 +31,7 @@ class JsProvider
      */
     public function getJsBundleUrl()
     {
-        return $this->app['config']->get('understand-laravel.cdn', 'https://cdn.understand.io/understand-js/beta/bundle.min.js');
+        return $this->app['config']->get('understand-laravel.cdn', 'https://cdn.understand.io/understand-js/' . self::DEFAULT_BUNDLE_VERSION . '/bundle.min.js');
     }
 
     /**

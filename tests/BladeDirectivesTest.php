@@ -42,7 +42,7 @@ class BladeDirectivesTest extends TestCase
 
         $this->assertEquals(UnderstandJsProvider::getJsConfig(), json_decode($configuration, true));
 
-        $this->assertEquals('Understand.installErrorHandlers();', $result[3]);
+        $this->assertEquals('Understand.catchErrors();', $result[3]);
         $this->assertEquals('</script>', $result[4]);
     }
 

@@ -71,7 +71,7 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
                 $out  = "<script src=\"" . UnderstandJsProvider::getJsBundleUrl() . "\"></script>\r\n";
                 $out .= "<script>\r\n";
                 $out .= "Understand.init(" . json_encode($configuration) . ");\r\n";
-                $out .= "Understand.installErrorHandlers();\r\n";
+                $out .= "Understand.catchErrors();\r\n";
                 $out .= "</script>";
 
                 return preg_replace($pattern, $out, $view);
@@ -93,7 +93,7 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
                 $out  = "<script src=\"" . UnderstandJsProvider::getJsBundleUrl() . "\"></script>\r\n";
                 $out .= "<script>\r\n";
                 $out .= "Understand.init(" . json_encode($configuration) . ");\r\n";
-                $out .= "Understand.installErrorHandlers();\r\n";
+                $out .= "Understand.catchErrors();\r\n";
                 $out .= "</script>";
 
                 return $out;
