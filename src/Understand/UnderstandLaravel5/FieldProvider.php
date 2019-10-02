@@ -1,5 +1,7 @@
 <?php namespace Understand\UnderstandLaravel5;
 
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Understand\UnderstandLaravel5\UniqueProcessIdentifier;
 use \Illuminate\Session\Store AS SessionStore;
 use \Illuminate\Routing\Router;
@@ -195,7 +197,7 @@ class FieldProvider
                 $caller = [$caller];
             }
 
-            $callback = array_get($caller, 0);
+            $callback = Arr::get($caller, 0);
             $args = [$log];
 
             $value = call_user_func_array($callback, $args);
@@ -356,7 +358,7 @@ class FieldProvider
 
         $url = $this->request->path();
 
-        if ( ! starts_with($url, '/'))
+        if ( ! Str::startsWith($url, '/'))
         {
             $url = '/' . $url;
         }

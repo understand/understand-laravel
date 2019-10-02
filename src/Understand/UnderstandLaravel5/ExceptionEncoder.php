@@ -301,7 +301,7 @@ class ExceptionEncoder
             }
             else if (is_string($arg))
             {
-                $params[] = 'string(' . $arg . ')';
+                $params[] = 'string(' . (strlen($arg) > 70 ? substr($arg, 0, 70) . '...' : $arg) . ')';
             }
             else if (is_int($arg))
             {
