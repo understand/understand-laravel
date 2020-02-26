@@ -4,12 +4,10 @@ class AsyncHandler extends BaseHandler
 {
 
     /**
-     * Send data to storage
-     *
-     * @param string $requestData
-     * @return void
+     * @param string $escapedData
+     * @return string|void
      */
-    protected function send($requestData)
+    protected function send($escapedData)
     {
         $parts = [
             'curl',
@@ -17,7 +15,7 @@ class AsyncHandler extends BaseHandler
             '--cacert',
             $this->sslBundlePath,
             '-d',
-            escapeshellarg($requestData),
+            $escapedData,
             $this->getEndpoint(),
             '> /dev/null 2>&1 &'
         ];
@@ -25,6 +23,21 @@ class AsyncHandler extends BaseHandler
         $cmd = implode(' ', $parts);
 
         exec($cmd);
+    }
+
+    /**
+     * @param $requestData
+     * @return string|void
+     */
+    protected function escapeshellarg($requestData)
+    {
+        // the `escapeshellarg` function throws a fatal error in Unix if the size exceeds 2097152 bytes (~2mb)
+        if (strlen($requestData) >= 2000000)
+        {
+            return;
+        }
+
+        return escapeshellarg($requestData);
     }
 
     /**
@@ -36,7 +49,11 @@ class AsyncHandler extends BaseHandler
     public function handle(array $requestData)
     {
         $json = json_encode($requestData);
+        $escapedData = $this->escapeshellarg($json);
 
-        $this->send($json);
+        if ($escapedData)
+        {
+            return $this->send($escapedData);
+        }
     }
 }
