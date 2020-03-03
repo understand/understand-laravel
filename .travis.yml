@@ -21,33 +21,39 @@ env:
   - ILLUMINATE_VERSION=5.7.* PHPUNIT_VERSION=~7.0
   - ILLUMINATE_VERSION=5.8.* PHPUNIT_VERSION=^7.5
   - ILLUMINATE_VERSION=6.0.* PHPUNIT_VERSION=^8.0
+  - ILLUMINATE_VERSION=7.0.* PHPUNIT_VERSION=^8.0
 
 matrix:
   exclude:
-    # 7.2
-    - php: 7.0
-      env: ILLUMINATE_VERSION=6.0.* PHPUNIT_VERSION=^8.0
-    - php: 7.1
-      env: ILLUMINATE_VERSION=6.0.* PHPUNIT_VERSION=^8.0
-    # 5.5 & 7.0
+    # 7.0
     - php: 7.0
       env: ILLUMINATE_VERSION=5.6.* PHPUNIT_VERSION=~7.0
     - php: 7.0
       env: ILLUMINATE_VERSION=5.7.* PHPUNIT_VERSION=~7.0
     - php: 7.0
       env: ILLUMINATE_VERSION=5.8.* PHPUNIT_VERSION=^7.5
-    # 5.4 & 7.1
+    - php: 7.0
+      env: ILLUMINATE_VERSION=6.0.* PHPUNIT_VERSION=^8.0
+    - php: 7.0
+      env: ILLUMINATE_VERSION=7.0.* PHPUNIT_VERSION=^8.0
+    # 7.1
     - php: 7.1
       env: ILLUMINATE_VERSION=5.1.* PHPUNIT_VERSION=~4.0
     - php: 7.1
       env: ILLUMINATE_VERSION=5.2.* PHPUNIT_VERSION=~4.0
     - php: 7.1
       env: ILLUMINATE_VERSION=5.3.* PHPUNIT_VERSION=~5.0
+    - php: 7.1
+      env: ILLUMINATE_VERSION=6.0.* PHPUNIT_VERSION=^8.0
+    - php: 7.1
+      env: ILLUMINATE_VERSION=7.0.* PHPUNIT_VERSION=^8.0
 
 before_install:
   - travis_retry composer self-update
   - composer require "illuminate/support:${ILLUMINATE_VERSION}" --no-update --prefer-dist
-  - if [ ${ILLUMINATE_VERSION} == "6.0.*" ];
+  - if [ ${ILLUMINATE_VERSION} == "7.0.*" ];
+    then composer require "orchestra/testbench:${ILLUMINATE_VERSION/7\./5\.}" --no-update --prefer-dist;
+    elif [ ${ILLUMINATE_VERSION} == "6.0.*" ];
     then composer require "orchestra/testbench:${ILLUMINATE_VERSION/6\./4\.}" --no-update --prefer-dist;
     else composer require "orchestra/testbench:${ILLUMINATE_VERSION/5\./3\.}" --no-update --prefer-dist;
     fi
