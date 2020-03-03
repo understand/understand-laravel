@@ -39,6 +39,7 @@ UNDERSTAND_TOKEN=your-input-token-from-understand-io
 - We recommend that you make use of a async handler - [How to send data asynchronously](#how-to-send-data-asynchronously)  
 - If you are using Laravel 5.0 (`>= 5.0, < 5.1`) version, please read about - [How to report Laravel 5.0 exceptions](#how-to-report-laravel-50--50--51-exceptions).
 - For advanced configuration please read about - [Advanced configuration](#advanced-configuration)
+- JavaScript Error Tracking for Laravel - [Understand.io JavaScript library](https://www.understand.io/docs/1.0/laravel/js)
 
 
 ### How to send events/logs

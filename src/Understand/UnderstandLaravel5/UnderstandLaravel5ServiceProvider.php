@@ -4,8 +4,10 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\Str;
 use Illuminate\Foundation\Application;
+use Blade;
 use Exception;
 use Throwable;
+use Understand\UnderstandLaravel5\Facades\UnderstandJsProvider;
 
 class UnderstandLaravel5ServiceProvider extends ServiceProvider
 {
@@ -37,7 +39,67 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
         {
             $this->listenQueryEvents();
         }
+
+        $this->registerBladeDirectives();
 	}
+
+    /**
+     * Register Blade directives.
+     *
+     * @return void
+     */
+	protected function registerBladeDirectives()
+    {
+        // L5.0 does not support custom directives
+        if ($this->detectLaravelVersion(['5.0']))
+        {
+            Blade::extend(function ($view, $compiler)
+            {
+                $configuration = UnderstandJsProvider::getJsConfig();
+
+                $pattern = $compiler->createMatcher('understandJsConfig');
+
+                return preg_replace($pattern, json_encode($configuration), $view);
+            });
+
+            Blade::extend(function ($view, $compiler)
+            {
+                $configuration = UnderstandJsProvider::getJsConfig();
+
+                $pattern = $compiler->createMatcher('understandJs');
+
+                $out  = "<script src=\"" . UnderstandJsProvider::getJsBundleUrl() . "\"></script>\r\n";
+                $out .= "<script>\r\n";
+                $out .= "Understand.init(" . json_encode($configuration) . ");\r\n";
+                $out .= "Understand.catchErrors();\r\n";
+                $out .= "</script>";
+
+                return preg_replace($pattern, $out, $view);
+            });
+        }
+        else
+        {
+            Blade::directive('understandJsConfig', function ()
+            {
+                $configuration = UnderstandJsProvider::getJsConfig();
+
+                return json_encode($configuration);
+            });
+
+            Blade::directive('understandJs', function ()
+            {
+                $configuration = UnderstandJsProvider::getJsConfig();
+
+                $out  = "<script src=\"" . UnderstandJsProvider::getJsBundleUrl() . "\"></script>\r\n";
+                $out .= "<script>\r\n";
+                $out .= "Understand.init(" . json_encode($configuration) . ");\r\n";
+                $out .= "Understand.catchErrors();\r\n";
+                $out .= "</script>";
+
+                return $out;
+            });
+        }
+    }
 
 	/**
 	 * Register the service provider.
@@ -48,6 +110,7 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
 	{
 		$this->registerConfig();
         $this->registerFieldProvider();
+        $this->registerJsProvider();
         $this->registerDataCollector();
         $this->registerTokenProvider();
         $this->registerLogger();
@@ -96,6 +159,25 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
         {
             $loader = AliasLoader::getInstance();
             $loader->alias('UnderstandFieldProvider', 'Understand\UnderstandLaravel5\Facades\UnderstandFieldProvider');
+        });
+    }
+
+    /**
+     * Register JS provider
+     *
+     * @return void
+     */
+    protected function registerJsProvider()
+    {
+        $this->app->bind('understand.jsProvider', function($app)
+        {
+            return new JsProvider($app);
+        });
+
+        $this->app->booting(function()
+        {
+            $loader = AliasLoader::getInstance();
+            $loader->alias('UnderstandJsProvider', 'Understand\UnderstandLaravel5\Facades\UnderstandJsProvider');
         });
     }
 
