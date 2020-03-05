@@ -281,6 +281,11 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
         $handlerType = $app['config']->get('understand-laravel.handler');
         $sslBundlePath = $app['config']->get('understand-laravel.ssl_ca_bundle');
 
+        if (is_null($sslBundlePath))
+        {
+            $sslBundlePath = __DIR__ . '/../../ca_bundle.crt';
+        }
+
         if ($handlerType == 'async')
         {
             return new Handlers\AsyncHandler($inputToken, $apiUrl, $sslBundlePath);

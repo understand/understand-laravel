@@ -48,7 +48,7 @@ return [
     /**
      * SSL CA Bundle location
      */
-    'ssl_ca_bundle' => base_path('vendor/understand/understand-laravel5/src/ca_bundle.crt'),
+    'ssl_ca_bundle' => null,
 
     /**
      * The log types that should not be sent to Understand.io.
