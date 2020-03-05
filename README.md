@@ -1,4 +1,4 @@
-## Laravel 5 and 6 integration for Understand.io
+## Laravel 5, 6 and 7 integration for Understand.io
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/understand/understand-laravel5.svg?style=flat-square)](https://packagist.org/packages/understand/understand-laravel5)
 [![Quality Score](https://img.shields.io/scrutinizer/g/understand/understand-laravel5.svg?style=flat-square)](https://scrutinizer-ci.com/g/understand/understand-laravel5)
@@ -13,7 +13,7 @@ This packages provides a full abstraction for Understand.io and provides extra f
 1. Add the package to your project
     
 ```
-composer require understand/understand-laravel5
+composer require understand/understand-laravel
 ```
 
 2. Add the ServiceProvider to the `providers` array in `config/app.php`
