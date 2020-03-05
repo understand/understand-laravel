@@ -1,6 +1,6 @@
 {
-    "name": "understand/understand-laravel5",
-    "description": "Laravel 5/6 service provider for Understand.io",
+    "name": "understand/understand-laravel",
+    "description": "Laravel 5, 6 and 7 service provider for Understand.io",
     "keywords": ["laravel", "understand.io", "understand", "logs", "laravel 5", "Laravel 6"],
     "license": "MIT",
     "authors": [
