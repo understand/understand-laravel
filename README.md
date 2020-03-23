@@ -65,7 +65,7 @@ The following extra information will be collected:
 Additionally, you can specify which HTTP request field values should not be sent to Understand.io.
 By default, the following field values will be hidden: 
 ```
-UNDERSTAND_HIDDEN_REQUEST_FIELDS=password,access_token,secret_key,token,access_key
+UNDERSTAND_HIDDEN_REQUEST_FIELDS=password,password_confirmation,access_token,secret_key,token,access_key
 ```
 
 If you wish you can publish the configuration file and make desired adjustments. See [Advanced configuration](#advanced-configuration)
