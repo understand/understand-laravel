@@ -171,6 +171,17 @@ class FieldProviderTest extends Orchestra\Testbench\TestCase
         $this->assertEquals('[value hidden]', $postData['password']);
     }
 
+    public function testPasswordConfirmationField()
+    {
+        \Illuminate\Support\Facades\Route::post('/', function() {});
+
+        $this->call('POST', '/', ['password_confirmation' => 'a']);
+
+        $postData = $this->app['understand.fieldProvider']->getPostDataArray();
+
+        $this->assertEquals('[value hidden]', $postData['password_confirmation']);
+    }
+
     public function testJsonRequest()
     {
         if ( ! method_exists($this, 'json'))

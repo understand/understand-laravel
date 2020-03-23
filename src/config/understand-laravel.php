@@ -70,5 +70,5 @@ return [
      * Field names which values should not be sent to Understand.io
      * It applies to POST and GET request parameters
      */
-    'hidden_fields' => explode(',', env('UNDERSTAND_HIDDEN_REQUEST_FIELDS', 'password,access_token,secret_key,token,access_key')),
+    'hidden_fields' => explode(',', env('UNDERSTAND_HIDDEN_REQUEST_FIELDS', 'password,password_confirmation,access_token,secret_key,token,access_key')),
 ];
