@@ -101,7 +101,7 @@ class ExceptionEncoderTest extends TestCase
         $encoder = new Understand\UnderstandLaravel5\ExceptionEncoder();
         $stackTraceArray = $encoder->stackTraceToArray($exception->getTrace());
 
-        if (Str::startsWith(phpversion(), ['7.2', '7.3']))
+        if (Str::startsWith(phpversion(), ['7.2', '7.3', '7.4']))
         {
             $this->assertSame('__PHP_Incomplete_Class', $stackTraceArray[$index]['args'][0]);
         }
