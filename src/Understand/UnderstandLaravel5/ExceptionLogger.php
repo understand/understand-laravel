@@ -139,6 +139,8 @@ class ExceptionLogger
             'client_ip' => 'UnderstandFieldProvider::getClientIp',
             'server_ip' => 'UnderstandFieldProvider::getServerIp',
             'user_agent' => 'UnderstandFieldProvider::getClientUserAgent',
+            'host' => 'UnderstandFieldProvider::getHost',
+            'origin' => 'UnderstandFieldProvider::getOrigin',
             'laravel_version' => 'UnderstandFieldProvider::getLaravelVersion',
             'sql_queries' => 'UnderstandFieldProvider::getSqlQueries',
             'artisan_command' => 'UnderstandFieldProvider::getArtisanCommandName',
