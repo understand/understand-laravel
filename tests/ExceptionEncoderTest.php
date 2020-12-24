@@ -55,7 +55,7 @@ class ExceptionEncoderTest extends TestCase
 
         $this->assertEmpty($stackTraceArray[0]['args']);
     }
-    
+
     public function testUndefinedFunctionIndex()
     {
         $stackTrace = debug_backtrace();
@@ -66,12 +66,12 @@ class ExceptionEncoderTest extends TestCase
 
         $this->assertEmpty($stackTraceArray[0]['function']);
     }
-    
+
     public function testIncompleteClass()
     {
         $catched = false;
-        
-        try 
+
+        try
         {
             // trigger invalid argument exception
             // to test __PHP_Incomplete_Class argument serialisation in `stackTraceToArray`
@@ -79,18 +79,18 @@ class ExceptionEncoderTest extends TestCase
             $incompleteObject = unserialize('O:1:"a":1:{s:5:"value";s:3:"100";}');
 
             with(new Understand\UnderstandLaravel5\ExceptionEncoder())->exceptionToArray($incompleteObject);
-            
+
             $this->fail('Should never be reached');
-        } 
-        catch (\Exception $exception) 
+        }
+        catch (Exception $exception)
         {
             $this->assertIncompleteClassStackTrace($exception, 0);
             $catched = true;
         }
-        
+
         $this->assertTrue($catched);
     }
-    
+
     /**
      * @param object $exception
      * @param integer $index
@@ -101,7 +101,12 @@ class ExceptionEncoderTest extends TestCase
         $encoder = new Understand\UnderstandLaravel5\ExceptionEncoder();
         $stackTraceArray = $encoder->stackTraceToArray($exception->getTrace());
 
-        if (Str::startsWith(phpversion(), ['7.2', '7.3']))
+        if (Str::startsWith(phpversion(), ['7.4', '8.0'])) {
+            // As of PHP 7.4 Exception::getTrace()
+            // no longer contains "args" keys by default
+            $this->assertSame([], $stackTraceArray[$index]['args']);
+        }
+        else if (Str::startsWith(phpversion(), ['7.2', '7.3']))
         {
             $this->assertSame('__PHP_Incomplete_Class', $stackTraceArray[$index]['args'][0]);
         }
