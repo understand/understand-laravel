@@ -31,6 +31,8 @@ class FieldProvider
         'getServerIp',
         'getClientIp',
         'getClientUserAgent',
+        'getHost',
+        'getOrigin',
         'getEnvironment',
         'getFromSession',
         'getProcessIdentifier',
@@ -546,6 +548,36 @@ class FieldProvider
         }
 
         return $this->request->server->get('HTTP_USER_AGENT');
+    }
+
+    /**
+     * Return client host
+     *
+     * @return string
+     */
+    protected function getHost()
+    {
+        if ( ! $this->request)
+        {
+            return null;
+        }
+
+        return $this->request->server->get('HTTP_HOST');
+    }
+
+    /**
+     * Return client origin
+     *
+     * @return string
+     */
+    protected function getOrigin()
+    {
+        if ( ! $this->request)
+        {
+            return null;
+        }
+
+        return $this->request->server->get('HTTP_ORIGIN');
     }
 
     /**

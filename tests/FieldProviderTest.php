@@ -147,6 +147,28 @@ class FieldProviderTest extends Orchestra\Testbench\TestCase
         $this->assertEquals('127.0 0.1', $ip);
     }
 
+    public function testGetHost()
+    {
+        \Illuminate\Support\Facades\Route::get('/', function() {});
+
+        $this->call('GET', '/', [], [], [], []);
+
+        $host = $this->app['understand.fieldProvider']->getHost();
+
+        $this->assertEquals('localhost', $host);
+    }
+
+    public function testGetOrigin()
+    {
+        \Illuminate\Support\Facades\Route::get('/', function() {});
+
+        $this->call('GET', '/', [], [], [], ['HTTP_ORIGIN' => 'remote.host']);
+
+        $origin = $this->app['understand.fieldProvider']->getOrigin();
+
+        $this->assertEquals('remote.host', $origin);
+    }
+
     public function testQueryString()
     {
         \Illuminate\Support\Facades\Route::get('/test', function() {});
@@ -223,7 +245,7 @@ class FieldProviderTest extends Orchestra\Testbench\TestCase
 
         $this->assertTrue(empty($postData));
     }
-  
+
     public function testGroupIdStaysTheSame()
     {
         $data = [
