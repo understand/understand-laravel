@@ -9,7 +9,7 @@ class Logger
     /**
      * Version Number
      */
-    const VERSION = 2.3;
+    const VERSION = 2.4;
 
     /**
      * Field provider
@@ -62,7 +62,7 @@ class Logger
         {
             $log = ['message' => $log];
         }
-        
+
         if (isset($log['message']))
         {
             $log['message'] = $this->formatMessage($log['message']);
@@ -98,10 +98,10 @@ class Logger
 
         return $data;
     }
-    
+
     /**
      * Format message field
-     * 
+     *
      * @param string $message
      * @return string
      */
@@ -111,13 +111,13 @@ class Logger
         {
             return (string)$message;
         }
-        
+
         // cast boolean values to "1" or "0" strings
         if ($message)
         {
             return '1';
         }
-        
+
         return '0';
     }
 
