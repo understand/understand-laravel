@@ -204,6 +204,9 @@ class ExceptionEncoder
 
             $file->seek($from);
 
+            // avoids this bug: https://bugs.php.net/bug.php?id=62004
+            $file->current();
+
             while ($file->key() < $to && ! $file->eof())
             {
                 $file->next();
@@ -317,7 +320,7 @@ class ExceptionEncoder
             }
             else if ($arg instanceof \__PHP_Incomplete_Class)
             {
-                $params[] = 'object(__PHP_Incomplete_Class)'; 
+                $params[] = 'object(__PHP_Incomplete_Class)';
             }
             else
             {
