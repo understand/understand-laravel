@@ -98,6 +98,10 @@ abstract class BaseHandler
      */
     protected function parseResponse($response)
     {
+        if (is_null($response)) {
+            return [];
+        }
+
         return json_decode($response, true);
     }
 }

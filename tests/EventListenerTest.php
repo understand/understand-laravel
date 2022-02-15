@@ -144,7 +144,7 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
 
         $this->assertSame($called, 2);
     }
-    
+
     /**
      * Test error handler logging
      */
@@ -168,18 +168,18 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
         $handler = new CallbackHandler($callback);
 
         $this->app['understand.logger'] = new Logger($fieldProvider, $handler, false);
-        
+
         $this->app->singleton('Illuminate\Contracts\Debug\ExceptionHandler', 'Illuminate\Foundation\Exceptions\Handler');
-            
+
         $exception = new \RuntimeException('Test');
         $this->app['Illuminate\Foundation\Exceptions\Handler']->report($exception);
-        
+
         $this->assertSame($called, 1);
     }
-        
+
     /**
      * Test message tag
-     * 
+     *
      * @return void
      */
     public function testExceptionLogTag()
@@ -199,28 +199,28 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
         $handler = new CallbackHandler($callback);
 
         $this->app['understand.logger'] = new Logger($fieldProvider, $handler, false);
-        
+
         $exception = new \RuntimeException('Test');
         $this->app['Psr\Log\LoggerInterface']->error($exception);
 
         $this->assertSame($called, 1);
         $this->assertTrue($exceptionLogTag);
     }
-    
+
     /**
      * Test token provider values
-     * 
+     *
      * @return void
      */
     public function testTokenProviderValue()
     {
         $token = $this->app['understand.tokenProvider']->getToken();
         $token2 = $this->app['understand.tokenProvider']->getToken();
-            
+
         $this->assertNotEmpty($token2);
         $this->assertSame($token2, $token);
     }
-    
+
     /**
      * @return void
      */
@@ -250,7 +250,7 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
         $this->assertSame($called, 1);
         $this->assertTrue($messageSame);
     }
-    
+
     /**
      * @return void
      */
@@ -265,8 +265,10 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
             $called++;
             $decoded = json_decode($data, true);
 
-            // `false` should be casted to `0`
-            $messageSame = '0' === $decoded['message'];
+            // `false` should be casted to `0` in L<9
+            // `false` should be casted to `` in L9
+            $messageSame = in_array($decoded['message'], ['', '0'], true);
+
             $laravelLogTag = in_array('exception_log', $decoded['tags'], true);
         };
 

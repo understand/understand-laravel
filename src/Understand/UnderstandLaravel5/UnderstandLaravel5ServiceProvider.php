@@ -298,10 +298,10 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
 
         throw new \ErrorException('understand-laravel handler misconfiguration:' . $handlerType);
     }
-    
+
     /**
      * Detect Laravel version
-     * 
+     *
      * @param array $versions
      * @return type
      */
@@ -309,7 +309,7 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
     {
         return Str::startsWith(Application::VERSION, $versions);
     }
-    
+
     /**
      * Listen Laravel logs and queue events
      *
@@ -329,7 +329,7 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
         {
             // starting from L5.4 MessageLogged event class was introduced
             // https://github.com/laravel/framework/commit/57c82d095c356a0fe0f9381536afec768cdcc072
-            $this->app['events']->listen('Illuminate\Log\Events\MessageLogged', function($log) 
+            $this->app['events']->listen('Illuminate\Log\Events\MessageLogged', function($log)
             {
 
                 $this->handleEvent($log->level, $log->message, $log->context);
@@ -401,7 +401,7 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
 
     /**
      * Handle a new log event
-     * 
+     *
      * @param string $level
      * @param mixed $message
      * @param array $context
