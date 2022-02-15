@@ -265,8 +265,10 @@ class EventListenerTest extends Orchestra\Testbench\TestCase
             $called++;
             $decoded = json_decode($data, true);
 
-            // `false` should be casted to `0`
-            $messageSame = '0' === $decoded['message'];
+            // `false` should be casted to `0` in L<9
+            // `false` should be casted to `` in L9
+            $messageSame = in_array($decoded['message'], ['', '0'], true);
+
             $laravelLogTag = in_array('exception_log', $decoded['tags'], true);
         };
 
