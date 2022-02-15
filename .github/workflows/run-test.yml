@@ -6,10 +6,12 @@ jobs:
 
     strategy:
       matrix:
-        php: [8.0, 7.4, 7.3, 7.2]
-        laravel: [8.*, 7.*, 6.*, 5.8.*, 5.7.*, 5.6.*, 5.5.*]
+        php: [8.1, 8.0, 7.4, 7.3, 7.2]
+        laravel: [9.*, 8.*, 7.*, 6.*, 5.8.*, 5.7.*, 5.6.*, 5.5.*]
 
         include:
+          - laravel: 9.*
+            testbench: 7.*
           - laravel: 8.*
             testbench: 6.*
           - laravel: 7.*
@@ -26,20 +28,36 @@ jobs:
             testbench: 3.5.*
 
         exclude:
-          - laravel: 8.*
-            php: 7.2
-          - laravel: 5.8.*
-            php: 8.0
-          - laravel: 5.7.*
-            php: 8.0
-          - laravel: 5.6.*
-            php: 8.0
-          - laravel: 5.5.*
-            php: 8.0
-          - laravel: 5.5.*
-            php: 7.4
+          - php: 7.2
+            laravel: 9.*
+          - php: 7.3
+            laravel: 9.*
+          - php: 7.2
+            laravel: 8.*
+          - php: 8.1
+            laravel: 7.*
+          - php: 8.1
+            laravel: 6.*
+          - php: 8.1
+            laravel: 5.8.*
+          - php: 8.0
+            laravel: 5.8.*
+          - php: 8.1
+            laravel: 5.7.*
+          - php: 8.0
+            laravel: 5.7.*
+          - php: 8.1
+            laravel: 5.6.*
+          - php: 8.0
+            laravel: 5.6.*
+          - php: 8.1
+            laravel: 5.5.*
+          - php: 8.0
+            laravel: 5.5.*
+          - php: 7.4
+            laravel: 5.5.*
 
-    name: P${{ matrix.php }} - L${{ matrix.laravel }}
+    name: P${{ matrix.php }} - L${{ matrix.laravel }} - T${{ matrix.testbench }}
 
     steps:
       - name: Checkout code
@@ -54,8 +72,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-            composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
-            composer update --prefer-dist --no-interaction
+          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+          composer update --prefer-dist --no-interaction
 
       - name: Execute tests
         run: vendor/bin/phpunit
