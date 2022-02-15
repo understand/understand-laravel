@@ -101,7 +101,7 @@ class ExceptionEncoderTest extends TestCase
         $encoder = new Understand\UnderstandLaravel5\ExceptionEncoder();
         $stackTraceArray = $encoder->stackTraceToArray($exception->getTrace());
 
-        if (Str::startsWith(phpversion(), ['7.4', '8.0'])) {
+        if (Str::startsWith(phpversion(), ['7.4', '8.0', '8.1'])) {
             // As of PHP 7.4 Exception::getTrace()
             // no longer contains "args" keys by default
             $this->assertSame([], $stackTraceArray[$index]['args']);
