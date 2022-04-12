@@ -117,6 +117,56 @@ Laravel's (`>= 5.0, < 5.1`) exception logger doesn't use event dispatcher (https
 php artisan vendor:publish --provider="Understand\UnderstandLaravel5\UnderstandLaravel5ServiceProvider"
 ```
 
+### Log Filter
+To filter out specific log types a custom log filter can be provided.
+
+**Example filter class**
+```php
+// app/Logging/UnderstandLogFilter.php
+<?php
+
+declare(strict_types=1);
+
+namespace App\Logging;
+
+use Illuminate\Support\Str;
+
+class UnderstandLogFilter
+{
+    public function __invoke($level, $message, $context): bool
+    {
+        if ($level === 'warning' && Str::contains(strtolower($message), 'deprecated')) {
+            return true;
+        }
+
+        return false;
+    }
+}
+```
+and then it can be configured in `understand-laravel.php`
+```php
+<?php
+// ...
+// config/understand-laravel.php
+'log_filter' => \App\Logging\UnderstandLogFilter::class,
+```
+
+The `log_filter` config value must be a callable type:
+- https://www.php.net/manual/en/function.is-callable.php  
+  or a callable dependency from the service container:
+- https://laravel.com/docs/9.x/container#the-make-method
+
+The suggested way would be to create an invokable class since it's hard to serialise anonymous functions (Laravel config cache):
+- https://www.php.net/manual/en/language.oop5.magic.php#object.invoke
+
+The log filter interface must be as follows: `$callable($level, $message, $context)`.
+The result of the filter must be a boolean value:
+- `TRUE`, the log should be ignored and NOT delivered to Understand.io
+- `FALSE`, the log should be delivered to Understand.io
+
+The `ignored_logs` config value has higher precedence than `log_filter`.
+
+
 ### Requirements 
 ##### UTF-8
 This package uses the json_encode function, which only supports UTF-8 data, and you should therefore ensure that all of your data is correctly encoded. In the event that your log data contains non UTF-8 strings, then the json_encode function will not be able to serialize the data.
