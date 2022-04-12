@@ -67,6 +67,25 @@ return [
     ],
 
     /**
+     * Log filter.
+     *
+     * The configuration value (filter) must be a callable type:
+     * - https://www.php.net/manual/en/function.is-callable.php
+     *
+     * The suggested way would be to create an invokable class since it's hard to serialise anonymous functions (Laravel config cache):
+     * - https://www.php.net/manual/en/language.oop5.magic.php#object.invoke
+     *
+     * The log (callable) filter interface is as follows: `$callable($level, $message, $context)`.
+     *
+     * The result of the filter must be a boolean value:
+     * - TRUE, the log should be ignored and NOT delivered to Understand.io
+     * - FALSE, the log should be delivered to Understand.io
+     *
+     * The `ignored_logs` config value has higher precedence than `log_filter`.
+     */
+    'log_filter' => null,
+
+    /**
      * Field names which values should not be sent to Understand.io
      * It applies to POST and GET request parameters
      */

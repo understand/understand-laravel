@@ -434,22 +434,27 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
         }
     }
 
-    /**
-     * @param $level
-     * @param $message
-     * @param $context
-     * @return bool
-     */
     protected function shouldIgnoreEvent($level, $message, $context)
     {
         $ignoredEventTypes = (array)$this->app['config']->get('understand-laravel.ignored_logs');
+        $logFilter = $this->app['config']->get('understand-laravel.log_filter');
 
-        if ( ! $ignoredEventTypes)
+        // check if the log should be ignored by its level (info, warning, etc.)
+        if ($ignoredEventTypes)
         {
-            return false;
+            return in_array($level, $ignoredEventTypes, true);
         }
 
-        return in_array($level, $ignoredEventTypes, true);
+        // check if a custom filter is set and whether the log should be ignored
+        // true - the log should be ignored
+        // false - the log should be delivered to Understand
+        if (is_callable($logFilter))
+        {
+            return (bool)$logFilter($level, $message, $context);
+        }
+
+        // by default logs are not ignored
+        return false;
     }
 
     /**
