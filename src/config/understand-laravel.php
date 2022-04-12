@@ -71,6 +71,8 @@ return [
      *
      * The configuration value (filter) must be a callable type:
      * - https://www.php.net/manual/en/function.is-callable.php
+     * or a callable dependency from the service container:
+     * - https://laravel.com/docs/9.x/container#the-make-method
      *
      * The suggested way would be to create an invokable class since it's hard to serialise anonymous functions (Laravel config cache):
      * - https://www.php.net/manual/en/language.oop5.magic.php#object.invoke

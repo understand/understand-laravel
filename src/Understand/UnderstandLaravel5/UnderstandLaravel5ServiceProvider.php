@@ -448,9 +448,11 @@ class UnderstandLaravel5ServiceProvider extends ServiceProvider
         // check if a custom filter is set and whether the log should be ignored
         // true - the log should be ignored
         // false - the log should be delivered to Understand
-        if (is_callable($logFilter))
+        if ($logFilter)
         {
-            return (bool)$logFilter($level, $message, $context);
+            $factory = is_callable($logFilter) ? $logFilter : $this->app->make($logFilter);
+
+            return (bool)$factory($level, $message, $context);
         }
 
         // by default logs are not ignored

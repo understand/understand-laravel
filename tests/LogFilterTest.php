@@ -48,6 +48,41 @@ class LogFilterTest extends Orchestra\Testbench\TestCase
     /**
      * @return void
      */
+    public function testServiceContainerDependency()
+    {
+        $logsSent = 0;
+
+        $callback = function() use(&$logsSent)
+        {
+            $logsSent++;
+        };
+
+        $dependencyName = 'service-container-dependency';
+        $dependencyCalled = false;
+
+        $this->app->bind($dependencyName, function() use(&$dependencyCalled) {
+            return function() use(&$dependencyCalled) {
+                $dependencyCalled = true;
+                // FALSE, logs should not be filtered
+                return false;
+            };
+        });
+
+        $this->app['config']->set('understand-laravel.log_filter', $dependencyName);
+
+        $handler = new CallbackHandler($callback);
+        $this->app['understand.logger'] = new Logger($this->app['understand.fieldProvider'], $handler);
+
+        // trigger error
+        $this->app['Psr\Log\LoggerInterface']->error('test');
+
+        $this->assertTrue($dependencyCalled);
+        $this->assertEquals(1, $logsSent);
+    }
+
+    /**
+     * @return void
+     */
     public function testLogFilterFiltersOneLog()
     {
         $logsSent = 0;
