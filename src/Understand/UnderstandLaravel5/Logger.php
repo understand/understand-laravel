@@ -9,7 +9,7 @@ class Logger
     /**
      * Version Number
      */
-    const VERSION = 2.6;
+    const VERSION = 2.7;
 
     /**
      * Field provider
