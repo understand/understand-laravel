@@ -1,6 +1,6 @@
 {
     "name": "understand/understand-laravel",
-    "description": "Laravel 5, 6, 7, 8 and 9 service provider for Understand.io",
+    "description": "Laravel 5, 6, 7, 8, 9 and 10 service provider for Understand.io",
     "keywords": ["laravel", "understand.io", "understand", "logs"],
     "license": "MIT",
     "authors": [
@@ -10,9 +10,9 @@
         }
     ],
     "require": {
-        "php": "^5.5 || ^7.0 || ^8.0 || ^8.1",
+        "php": "^5.5 || ^7.0 || ^8.0 || ^8.1 || ^8.2",
         "ext-curl": "*",
-        "illuminate/support": "^5.0 || ^6.0 || ^7.0 || ^8.0 || ^9.0"
+        "illuminate/support": "^5.0 || ^6.0 || ^7.0 || ^8.0 || ^9.0 || ^10.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^6.0 || ^7.0 || ^8.0 || ^9.0",
@@ -25,9 +25,14 @@
             "Understand\\UnderstandLaravel5\\": "src"
 		}
     },
+    "config": {
+        "allow-plugins": {
+            "kylekatarnls/update-helper": true
+        }
+    },
     "extra": {
         "component": "package",
-        "frameworks": ["Laravel 5", "Laravel 6", "Laravel 7", "Laravel 8", "Laravel 9"],
+        "frameworks": ["Laravel 5", "Laravel 6", "Laravel 7", "Laravel 8", "Laravel 9", "Laravel 10"],
         "branch-alias": {
 			"dev-master": "2.0-dev"
 		},
