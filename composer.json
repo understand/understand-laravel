@@ -25,6 +25,11 @@
             "Understand\\UnderstandLaravel5\\": "src"
 		}
     },
+    "config": {
+        "allow-plugins": {
+            "kylekatarnls/update-helper": true
+        }
+    },
     "extra": {
         "component": "package",
         "frameworks": ["Laravel 5", "Laravel 6", "Laravel 7", "Laravel 8", "Laravel 9", "Laravel 10"],
