@@ -1,4 +1,4 @@
-## Laravel 5, 6, 7, 8, 9 and 10 integration for Understand.io
+## Laravel 5, 6, 7, 8, 9, 10 and 11 integration for Understand.io
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/understand/understand-laravel5.svg?style=flat-square)](https://packagist.org/packages/understand/understand-laravel5)
 [![Quality Score](https://img.shields.io/scrutinizer/g/understand/understand-laravel5.svg?style=flat-square)](https://scrutinizer-ci.com/g/understand/understand-laravel5)
