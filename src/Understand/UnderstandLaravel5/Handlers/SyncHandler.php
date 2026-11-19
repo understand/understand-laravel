@@ -30,7 +30,11 @@ class SyncHandler extends BaseHandler
 
         $response = curl_exec($ch);
 
-        curl_close($ch);
+        // curl_close() has no effect since PHP 8.0 and is deprecated as of PHP 8.5
+        if (PHP_VERSION_ID < 80000)
+        {
+            curl_close($ch);
+        }
 
         return $response;
     }
