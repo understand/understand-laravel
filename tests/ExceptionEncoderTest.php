@@ -101,12 +101,12 @@ class ExceptionEncoderTest extends TestCase
         $encoder = new Understand\UnderstandLaravel5\ExceptionEncoder();
         $stackTraceArray = $encoder->stackTraceToArray($exception->getTrace());
 
-        if (Str::startsWith(phpversion(), ['7.4', '8.0', '8.1', '8.2', '8.3'])) {
-            // As of PHP 7.4 Exception::getTrace()
-            // no longer contains "args" keys by default
+        if (version_compare(PHP_VERSION, '7.4', '>=') && ini_get('zend.exception_ignore_args')) {
+            // As of PHP 7.4 Exception::getTrace() does not contain "args"
+            // when zend.exception_ignore_args is enabled (production default)
             $this->assertSame([], $stackTraceArray[$index]['args']);
         }
-        else if (Str::startsWith(phpversion(), ['7.2', '7.3']))
+        else if (version_compare(PHP_VERSION, '7.2', '>='))
         {
             $this->assertSame('__PHP_Incomplete_Class', $stackTraceArray[$index]['args'][0]);
         }
