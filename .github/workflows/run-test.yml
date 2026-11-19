@@ -179,7 +179,13 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+          # The matrix intentionally tests EOL Laravel versions that have known
+          # security advisories. Allow installing them in CI only; this config is
+          # never applied to projects that install this package.
+          composer config audit.block-insecure false || true
+          composer config policy.advisories.block false || true
+          composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
+          composer require --dev "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
           composer update --prefer-dist --no-interaction
 
       - name: Execute tests
